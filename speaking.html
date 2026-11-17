@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IELTS Speaking Practice</title>
+<link rel="preload" href="fonts/bricolage-grotesque-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-display:swap;font-weight:200 800;src:url(fonts/bricolage-grotesque-vietnamese-opsz-normal.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-display:swap;font-weight:200 800;src:url(fonts/bricolage-grotesque-latin-ext-opsz-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-display:swap;font-weight:200 800;src:url(fonts/bricolage-grotesque-latin-opsz-normal.woff2) format("woff2");unicode-range:U+0000-00A2,U+00A4-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/*
+  Design read: exam-practice app for IELTS students, printed-test-booklet language,
+  native CSS, Bricolage Grotesque only (weights 400-800, never italic), cobalt blue + sun yellow, motion-led.
+  Dials: variance 4, motion 5, density 5.
+  Shape rule: interactive controls 6px radius, panels and feedback blocks 2px, page structure square.
+*/
+:root{
+  --bg:#f6f8ff; --surface:#ffffff; --sunk:#eaeefb; --ink:#0b1230; --ink-2:#39425f; --ink-3:#5f6786;
+  --rule:#dde2f2; --rule-strong:#0b1230;
+  --accent:#2447f5; --accent-ink:#ffffff; --accent-hover:#1a37c9; --accent-tint:#e6ebff;
+  --sun:#ffd23f; --sun-ink:#1a1500; --sun-tint:#fff3bf;
+  --ok:#17784a; --ok-tint:#e5f3ec; --ok-rule:#9fd0b6;
+  --bad:#b3261e; --bad-tint:#fbeaea; --bad-rule:#eeb2ad;
+  --skip:#7a5b00; --skip-tint:#f8f1dc; --skip-rule:#dfcb8f;
+  --warn:#9a5b00;
+  --r-ctl:6px; --r-panel:9px;
+  --ease:cubic-bezier(.65,0,.35,1); --smooth:cubic-bezier(.65,0,.35,1); --spring:cubic-bezier(.65,0,.35,1);
+  --fs:1rem; --pfs:1.08rem;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#080d24; --surface:#0f1736; --sunk:#172046; --ink:#eef1ff; --ink-2:#bcc4e6; --ink-3:#8c95bd;
+  --rule:#232c57; --rule-strong:#eef1ff;
+  --accent:#7f9bff; --accent-ink:#071035; --accent-hover:#a3b8ff; --accent-tint:#1a2656;
+  --sun:#ffd84a; --sun-ink:#1a1500; --sun-tint:#2b2608;
+  --ok:#5fcb92; --ok-tint:#14261d; --ok-rule:#2c5a41;
+  --bad:#ff8a80; --bad-tint:#2c1615; --bad-rule:#6b2b27;
+  --skip:#e2c46b; --skip-tint:#29230f; --skip-rule:#5c4d1e;
+  --warn:#f0b35a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;font-style:normal!important}
+em,i,cite,var,dfn{font-weight:600}
+body{font-optical-sizing:auto}
+html,body{margin:0}
+body{font-family:"Bricolage Grotesque",sans-serif;font-size:var(--fs);line-height:1.5;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;transition:background-color .3s,color .3s}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
+.hidden{display:none!important}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.screen{min-height:100dvh}
+.screen.enter{animation:enter .45s var(--ease) both}
+@keyframes enter{from{opacity:0;transform:translateY(8px)}}
+
+/* ---------- buttons ---------- */
+.btn{position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:.5em;height:44px;padding:0 1.25em;border-radius:var(--r-ctl);font-weight:700;white-space:nowrap;transition:transform .12s ease,color .25s,border-color .25s}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.btn:hover::before{transform:scaleX(1)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary::before{background:var(--accent-hover)}
+.btn-line{border:1.5px solid var(--rule-strong);color:var(--ink)}
+.btn-line::before{background:var(--ink)}
+.btn-line:hover{color:var(--bg)}
+.btn-quiet{color:var(--ink-2);height:36px;padding:0 .8em;border:1px solid var(--rule)}
+.btn-quiet::before{background:var(--sunk)}
+.btn-quiet:hover{color:var(--ink)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.textbtn{color:var(--accent);font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;transition:text-underline-offset .2s}
+.textbtn:hover{text-underline-offset:5px}
+
+/* ---------- shared header ---------- */
+.bar{display:flex;align-items:center;gap:16px;height:60px;padding:0 clamp(16px,3vw,40px);border-bottom:1px solid var(--rule);background:var(--surface)}
+.wordmark{font-weight:800;letter-spacing:-.01em;font-size:1.02rem;white-space:nowrap}
+.wordmark span{color:var(--accent)}
+.bar .spacer{flex:1}
+.bar .who{color:var(--ink-3);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.theme-btn{height:36px;padding:0 .75em;border:1px solid var(--rule);border-radius:var(--r-ctl);font-size:.85rem;font-weight:600;color:var(--ink-2);transition:border-color .2s,color .2s}
+.theme-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ---------- welcome ---------- */
+.welcome{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);min-height:calc(100dvh - 60px)}
+.welcome-main{align-self:center;padding:clamp(32px,7vw,96px) clamp(20px,6vw,88px);max-width:680px}
+.welcome-main h1{font-size:clamp(2.2rem,4.2vw,3.4rem);line-height:1.04;margin-bottom:.45em;max-width:12ch}
+.welcome-main p{color:var(--ink-2);font-size:1.08rem;max-width:46ch;margin:0 0 2.2em}
+.field{display:grid;gap:8px;max-width:420px}
+.field label{font-weight:700;font-size:.95rem}
+.field input{height:52px;padding:0 14px;border:1.5px solid var(--rule);border-radius:var(--r-ctl);background:var(--surface);font-size:1.05rem;transition:border-color .2s}
+.field input:hover{border-color:var(--ink-3)}
+.field input:focus{outline:none;border-color:var(--accent)}
+.field .help{font-size:.86rem;color:var(--ink-3)}
+.field .err{font-size:.88rem;color:var(--bad);min-height:1.3em}
+.welcome-aside{border-left:1px solid var(--rule);background:var(--surface);padding:clamp(32px,6vw,80px) clamp(20px,4vw,56px);display:flex;flex-direction:column;justify-content:center;gap:22px}
+.sample{max-width:520px}
+.sample .src{font-family:"Bricolage Grotesque",sans-serif;font-size:1.12rem;line-height:1.65;color:var(--ink-2);margin:0 0 20px}
+.sample .src mark{background:var(--accent-tint);color:var(--ink);padding:0 2px}
+.sample .stmt{font-weight:600;margin:0 0 10px}
+.sample-note{font-size:.9rem;color:var(--ink-3);max-width:44ch}
+
+/* ---------- home ---------- */
+.home{max-width:1100px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(16px,4vw,48px) 80px}
+.home h1{font-size:clamp(2rem,4.4vw,3.1rem);line-height:1.05}
+.home .lede{color:var(--ink-2);font-size:1.05rem;margin:.6em 0 0;max-width:62ch}
+.trio{list-style:none;margin:36px 0 0;padding:0;border-top:2px solid var(--rule-strong)}
+.trio li{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:20px;align-items:center;padding:22px 0;border-bottom:1px solid var(--rule)}
+.trio .pn{font-size:2.6rem;font-weight:800;line-height:1;color:var(--accent)}
+.trio h3{font-size:clamp(1.1rem,2vw,1.35rem);font-weight:700;letter-spacing:-.01em;line-height:1.25}
+.trio .meta{color:var(--ink-3);font-size:.92rem;margin-top:4px}
+.diff{display:inline-flex;align-items:center;gap:10px;font-size:.88rem;font-weight:600;color:var(--ink-2)}
+.diff i{display:inline-flex;gap:3px}
+.trio .diff{flex-direction:row-reverse;justify-self:end}
+[hidden]{display:none!important}
+.diff i b{width:6px;height:16px;background:var(--rule);border-radius:1px}
+.diff[data-l="1"] i b:nth-child(-n+1),.diff[data-l="2"] i b:nth-child(-n+2),.diff[data-l="3"] i b:nth-child(-n+3){background:var(--accent)}
+.trio.swap li{animation:swapIn .5s var(--ease) both}
+.trio.swap li:nth-child(2){animation-delay:.06s}.trio.swap li:nth-child(3){animation-delay:.12s}
+@keyframes swapIn{from{opacity:0;transform:translateX(-14px)}}
+.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:26px}
+.actions .hint{color:var(--ink-3);font-size:.9rem;margin-left:4px}
+.resume{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:32px;padding:20px 22px;border:1.5px solid var(--accent);border-radius:var(--r-panel);background:var(--accent-tint)}
+.resume b{display:block;font-size:1.05rem}
+.resume span{color:var(--ink-2);font-size:.92rem}
+.history{margin-top:64px}
+.history h2{font-size:1.35rem;margin-bottom:14px}
+.htable{width:100%;border-collapse:collapse;font-size:.94rem}
+.htable th{text-align:left;font-weight:600;color:var(--ink-3);font-size:.85rem;padding:0 12px 10px 0;border-bottom:2px solid var(--rule-strong)}
+.htable td{padding:13px 12px 13px 0;vertical-align:top}
+.htable tbody tr+tr td{border-top:1px solid var(--rule)}
+.htable .band{font-weight:800;font-size:1.05rem}
+.htable .pas{color:var(--ink-3)}
+.empty{color:var(--ink-3);padding:18px 0;border-top:1px solid var(--rule)}
+
+/* ---------- test ---------- */
+#screen-test{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.tbar{display:flex;align-items:stretch;gap:12px;height:60px;padding:0 clamp(10px,2vw,24px);border-bottom:1px solid var(--rule);background:var(--surface)}
+.tabs{position:relative;display:flex;align-items:stretch;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tab{position:relative;display:flex;align-items:center;gap:10px;padding:0 14px;font-weight:600;color:var(--ink-3);white-space:nowrap;transition:color .2s}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--ink)}
+.tab small{font-weight:500;color:var(--ink-3);font-size:.82rem}
+.tab-line{position:absolute;bottom:0;height:3px;background:var(--accent);transition:transform .4s var(--ease),width .4s var(--ease);left:0;width:0}
+.tools{display:flex;align-items:center;gap:6px}
+.sq{width:36px;height:36px;border:1px solid var(--rule);border-radius:var(--r-ctl);font-weight:700;font-size:.85rem;color:var(--ink-2);transition:border-color .2s,color .2s,transform .12s}
+.sq:hover{border-color:var(--ink);color:var(--ink)}
+.sq:active{transform:scale(.94)}
+.timer{display:flex;align-items:center;gap:8px;padding:0 4px 0 10px;font-weight:800;font-size:1.25rem;letter-spacing:.01em}
+.timer small{font-size:.75rem;font-weight:600;color:var(--ink-3)}
+.timer.warn{color:var(--warn)}
+.timer.danger{color:var(--bad)}
+.timer.over{color:var(--bad)}
+.timer.over small{color:var(--bad)}
+.timer.bump{animation:bump .5s var(--ease)}
+@keyframes bump{30%{transform:scale(1.12)}}
+.tbar .btn{align-self:center}
+.homebtn{flex:none}
+.mswitch{display:none}
+.split{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0}
+.pane{overflow-y:auto;min-height:0;overscroll-behavior:contain}
+.pane-in{max-width:740px;margin:0 auto;padding:clamp(22px,3.4vw,44px) clamp(18px,3.4vw,44px) 96px}
+.ppane{background:var(--surface);border-right:1px solid var(--rule)}
+.ppane .pane-in{font-size:var(--pfs);font-weight:400;line-height:1.72;color:var(--ink)}
+.ptitle{font-family:"Bricolage Grotesque",sans-serif;font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.1;margin:0 0 .3em}
+.pmeta{font-family:"Bricolage Grotesque",sans-serif;font-size:.88rem;color:var(--ink-3);margin-bottom:1.6em;display:flex;gap:14px;align-items:center}
+.passage p{margin:0 0 1em}
+.passage h1:not(.ptitle),.passage h2:not(.ptitle),.passage h3,.passage h4{font-family:"Bricolage Grotesque",sans-serif;font-size:1.05rem;margin:1.4em 0 .5em}
+.tbl{overflow-x:auto;margin:1em 0}
+.passage table,.qb table{border-collapse:collapse;width:100%;font-family:"Bricolage Grotesque",sans-serif;font-size:.92rem}
+.passage td,.passage th,.qb td,.qb th{border:1px solid var(--rule);padding:8px 10px;vertical-align:top;text-align:left}
+.qb th{background:var(--sunk)}
+.qb img,.passage img{max-width:100%;height:auto;display:block;margin:12px 0;border:1px solid var(--rule);background:#fff}
+.swapin{animation:paneIn .4s var(--ease) both}
+@keyframes paneIn{from{opacity:0;transform:translateY(6px)}}
+.qsec{padding-top:22px;margin-top:30px;border-top:2px solid var(--rule-strong)}
+.qsec:first-child{margin-top:0}
+.qsec h3{font-size:1rem;font-weight:800;margin-bottom:10px}
+.qb{font-size:.98rem;color:var(--ink)}
+.qb p{margin:.55em 0}
+.qb ul,.qb ol{padding-left:1.2em}
+.qb blockquote{margin:0}
+.qitem{scroll-margin:120px;transition:background-color .6s}
+.qitem.flash{background:var(--accent-tint)}
+/* segmented control */
+.seg{display:inline-flex;flex-wrap:wrap;margin:8px 0 6px;border-radius:var(--r-ctl)}
+.seg button{position:relative;overflow:hidden;isolation:isolate;min-width:44px;height:38px;padding:0 14px;margin-left:-1px;border:1px solid var(--rule);background:var(--surface);font-weight:600;font-size:.86rem;color:var(--ink-2);transition:color .2s,border-color .2s,transform .12s}
+.seg button:first-child{margin-left:0;border-radius:var(--r-ctl) 0 0 var(--r-ctl)}
+.seg button:last-child{border-radius:0 var(--r-ctl) var(--r-ctl) 0}
+.seg button::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--sunk);transform:scaleY(0);transform-origin:bottom;transition:transform .3s var(--ease)}
+.seg button:hover::before{transform:scaleY(1)}
+.seg button:hover{color:var(--ink);z-index:1}
+.seg button:active{transform:scale(.95)}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);z-index:2}
+.seg button.on::before{display:none}
+.ctl-block{display:flex}
+/* text gaps */
+.gap{display:inline-flex;align-items:baseline;gap:6px;margin:0 3px;vertical-align:baseline}
+.gap-n{font-size:.72rem;font-weight:800;color:var(--accent-ink);background:var(--ink);padding:1px 5px;border-radius:2px;transform:translateY(-2px)}
+:root[data-theme="dark"] .gap-n{background:var(--ink-2)}
+.ans{width:4.5em;min-width:4.5em;max-width:100%;height:26px;padding:0 6px;border:0;border-bottom:2px solid var(--ink-3);background:transparent;font-weight:600;color:var(--accent);transition:border-color .2s,background-color .2s}
+.ans:hover{border-bottom-color:var(--ink)}
+.ans:focus{outline:none;border-bottom-color:var(--accent);background:var(--accent-tint)}
+.ans.filled{border-bottom-color:var(--accent)}
+.ans-line{display:flex;align-items:center;gap:8px;margin:6px 0}
+/* select */
+.sel{position:relative;display:inline-block;max-width:100%;margin:8px 0 6px}
+.sel select{appearance:none;-webkit-appearance:none;max-width:min(560px,100%);height:40px;padding:0 2.4em 0 .8em;border:1px solid var(--rule);border-radius:var(--r-ctl);background:var(--surface);font-weight:600;font-size:.9rem;cursor:pointer;transition:border-color .2s}
+.sel::after{content:"";position:absolute;right:14px;top:50%;width:7px;height:7px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.sel select:hover{border-color:var(--ink)}
+.sel select:focus{outline:none;border-color:var(--accent)}
+.sel select.filled{border-color:var(--accent);color:var(--accent)}
+/* multiple choice */
+.mcq{margin:14px 0 10px}
+.mcq-stem{font-weight:600;margin-bottom:8px;display:flex;gap:10px}
+.mcq-stem b{flex:none;min-width:1.7em;font-weight:800;color:var(--accent)}
+.opt{position:relative;overflow:hidden;isolation:isolate;display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:10px 12px;margin:6px 0;border:1px solid var(--rule);border-radius:var(--r-ctl);background:var(--surface);transition:border-color .2s,transform .12s}
+.opt::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--sunk);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.opt:hover::before{transform:scaleX(1)}
+.opt:hover{border-color:var(--ink-3)}
+.opt:active{transform:scale(.99)}
+.opt .l{flex:none;display:grid;place-items:center;width:26px;height:26px;border:1.5px solid var(--ink-3);border-radius:4px;font-weight:800;font-size:.8rem;transition:background-color .2s,border-color .2s,color .2s}
+.opt.on{border-color:var(--accent)}
+.opt.on::before{transform:scaleX(1);background:var(--accent-tint)}
+.opt.on .l{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opt.nope{animation:nope .35s}
+@keyframes nope{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.mhead{display:flex;justify-content:space-between;font-size:.88rem;color:var(--ink-3);font-weight:600;margin:6px 0 2px}
+.mhead .cnt{color:var(--accent)}
+.qgrid{display:grid;gap:6px;margin-top:10px}
+/* navigator */
+.nav{display:flex;align-items:center;gap:14px;min-height:60px;flex:none;padding:0 clamp(10px,2vw,24px);border-top:1px solid var(--rule);background:var(--surface)}
+.qnums{display:flex;gap:4px;overflow-x:auto;flex:1;padding:2px;scrollbar-width:thin}
+.qn{flex:none;width:32px;height:32px;border:1px solid var(--rule);border-radius:4px;font-size:.8rem;font-weight:700;color:var(--ink-3);transition:background-color .2s,color .2s,border-color .2s,transform .12s}
+.qn:hover{border-color:var(--ink);color:var(--ink)}
+.qn:active{transform:scale(.92)}
+.qn.done{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.prog{font-size:.88rem;font-weight:600;color:var(--ink-2);white-space:nowrap}
+/* dialog + toasts */
+.overlay{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(10,12,16,.55);animation:fade .2s ease both}
+@keyframes fade{from{opacity:0}}
+.dialog{width:min(460px,100%);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-panel);padding:26px;animation:dlg .35s var(--ease) both}
+@keyframes dlg{from{opacity:0;transform:translateY(12px)}}
+.dialog h3{font-size:1.35rem;margin-bottom:.4em}
+.dialog p{color:var(--ink-2);margin:0 0 1.4em}
+.dialog .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.toasts{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;display:grid;gap:8px;width:min(420px,calc(100% - 24px))}
+.toast{padding:12px 16px;border-radius:var(--r-panel);background:var(--ink);color:var(--bg);font-weight:600;font-size:.92rem;animation:tin .35s var(--ease) both}
+.toast.warn{background:var(--warn);color:#fff}
+.toast.out{animation:tout .25s ease forwards}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}}
+@keyframes tout{to{opacity:0;transform:translateY(6px)}}
+.preview-note{position:fixed;left:12px;bottom:72px;z-index:60;max-width:calc(100% - 24px);background:var(--ink);color:var(--bg);font-size:.8rem;font-weight:600;padding:6px 10px;border-radius:var(--r-panel);animation:tin .35s var(--ease) both}
+
+/* ---------- results ---------- */
+.results{max-width:1100px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(16px,4vw,48px) 96px}
+.score{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,5vw,64px);align-items:end;padding-bottom:32px;border-bottom:2px solid var(--rule-strong)}
+.bigband{font-size:clamp(5.5rem,14vw,9.5rem);font-weight:800;line-height:.82;letter-spacing:-.05em;color:var(--accent)}
+.bandlabel{font-weight:700;margin-top:14px}
+.score h1{font-size:clamp(1.6rem,3.2vw,2.3rem);line-height:1.1;margin-bottom:.5em}
+.score p{color:var(--ink-2);margin:0 0 .4em;max-width:58ch}
+.facts{display:flex;flex-wrap:wrap;gap:6px 26px;margin-top:14px;font-size:.95rem}
+.facts span{color:var(--ink-3)}
+.facts b{color:var(--ink)}
+.facts .over b{color:var(--bad)}
+.mail{margin-top:16px;font-size:.92rem;font-weight:600}
+.mail.ok{color:var(--ok)}.mail.bad{color:var(--bad)}.mail.wait{color:var(--ink-3)}
+.save{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center;padding:26px 0;border-bottom:1px solid var(--rule)}
+.save .txt{font-size:.92rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.save .txt b{display:block;color:var(--ink);font-size:1rem;margin-bottom:4px;word-break:break-all}
+.thumbwrap{display:block;width:96px;height:130px;border:1px solid var(--rule);background:var(--sunk);overflow:hidden;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.save .thumb{display:block;width:100%;opacity:0;transition:opacity .4s var(--ease),transform .25s var(--ease)}
+.save.ready .thumb{opacity:1}
+@media (max-width:560px){.save{grid-template-columns:auto minmax(0,1fr);gap:16px}.thumbwrap{width:72px;height:98px}.save .btn{width:100%}}
+.maps{margin-top:34px;display:grid;gap:18px}
+.map{display:grid;grid-template-columns:minmax(0,260px) 90px minmax(0,1fr);gap:16px;align-items:center}
+.map .t{font-weight:700;line-height:1.3}
+.map .t small{display:block;font-weight:500;color:var(--ink-3);font-size:.85rem}
+.map .s{font-size:1.4rem;font-weight:800}
+.map .s small{font-size:.9rem;color:var(--ink-3);font-weight:600}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.cell{width:26px;height:26px;border-radius:3px;font-size:.7rem;font-weight:700;display:grid;place-items:center;transition:transform .15s;animation:cellIn .4s var(--ease) both}
+.cell:hover{transform:scale(1.12)}
+.cell.correct{background:var(--ok);color:var(--surface)}
+.cell.wrong{background:var(--bad);color:var(--surface)}
+.cell.blank{background:var(--skip-tint);color:var(--skip);border:1.5px dashed var(--skip)}
+@keyframes cellIn{from{opacity:0;transform:scale(.6)}}
+.filter{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin:52px 0 6px}
+.filter h2{font-size:1.5rem;margin-right:auto}
+.key{display:flex;gap:14px;font-size:.84rem;color:var(--ink-3);font-weight:600}
+.key span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.key .k1::before{background:var(--ok)}.key .k2::before{background:var(--bad)}.key .k3::before{border:1.5px dashed var(--skip)}
+.ptext{margin:0 0 14px;border:1px solid var(--rule);border-radius:var(--r-panel);background:var(--surface)}
+.ptext summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;font-weight:700;transition:background-color .2s}
+.ptext summary::-webkit-details-marker{display:none}
+.ptext summary:hover{background:var(--sunk)}
+.ptext summary .chev{width:10px;height:10px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);transform:rotate(45deg) translateY(-3px);transition:transform .3s var(--ease)}
+.ptext[open] summary .chev{transform:rotate(225deg) translateY(-3px)}
+.ptext summary small{font-weight:500;color:var(--ink-3);font-size:.86rem;margin-left:8px}
+.ptext .rp{padding:4px 22px 22px;font-size:1.02rem;line-height:1.75;max-height:70vh;overflow-y:auto;border-top:1px solid var(--rule)}
+.ptext[open] .rp{animation:paneIn .35s var(--ease) both}
+.rp p{margin:0 0 1em}
+mark.clue{background:#ffe57a;color:#16181d;padding:1px 0;border-radius:1px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.cn{display:inline-block;margin:0 3px 0 1px;padding:0 4px;font-size:.78em;font-weight:800;line-height:1.35;color:#16181d;background:#ffd23f;border-radius:2px;cursor:pointer;vertical-align:1px;transition:transform .15s}
+.cn:hover{transform:translateY(-1px)}
+.cn.flash,mark.clue.flash{outline:3px solid var(--accent);outline-offset:1px}
+.findbtn{margin-top:10px;font-size:.88rem}
+.rpart h3{font-size:1.15rem;margin:36px 0 12px;display:flex;gap:12px;align-items:baseline}
+.rpart h3 small{font-size:.88rem;color:var(--ink-3);font-weight:600}
+.ritem{padding:16px 18px;margin-bottom:8px;border:1px solid;border-radius:var(--r-panel);scroll-margin:24px;animation:paneIn .4s var(--ease) both}
+.ritem.correct{background:var(--ok-tint);border-color:var(--ok-rule)}
+.ritem.wrong{background:var(--bad-tint);border-color:var(--bad-rule)}
+.ritem.blank{background:var(--skip-tint);border-color:var(--skip-rule)}
+.ritem.flash{animation:flashItem 1.2s var(--ease)}
+@keyframes flashItem{0%,40%{outline:3px solid var(--accent);outline-offset:2px}100%{outline:3px solid transparent;outline-offset:2px}}
+.rh{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.rh b{font-weight:800}
+.rh .v{font-weight:700;font-size:.92rem}
+.correct .v{color:var(--ok)}.wrong .v{color:var(--bad)}.blank .v{color:var(--skip)}
+.rh .ty{color:var(--ink-3);font-size:.84rem}
+.rq{font-weight:500;margin:2px 0 10px}
+.ra{display:flex;flex-wrap:wrap;gap:4px 22px;font-size:.94rem;margin-bottom:8px}
+.ra span{color:var(--ink-2)}
+.ra b{color:var(--ink)}
+.rx{font-size:.93rem;color:var(--ink-2)}
+.rx q{display:block;margin:8px 0 0;padding-left:16px;font-size:1rem;font-weight:500;color:var(--ink);quotes:"\201C" "\201D"}
+.rx .note{display:block;margin-top:6px;font-size:.88rem;color:var(--ink-3)}
+.end{display:flex;gap:12px;margin-top:40px}
+
+.skills{display:flex;align-self:stretch;gap:2px;margin-left:6px}
+.skills a{display:flex;align-items:center;padding:0 12px;font-weight:700;font-size:.95rem;color:var(--ink-3);text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .25s}
+.skills a:hover{color:var(--ink)}
+.skills a.on{color:var(--ink);border-bottom-color:var(--accent)}
+a.wordmark{color:var(--ink);text-decoration:none}
+.newonly{margin-top:24px;display:grid;gap:6px}
+.check{position:relative;display:inline-flex;align-items:center;gap:10px;font-weight:600;cursor:pointer;width:fit-content;max-width:100%}
+.check input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.check .box{width:20px;height:20px;border:1.5px solid var(--ink-2);border-radius:3px;display:grid;place-items:center;flex:none;transition:background-color .2s,border-color .2s}
+.check .box::after{content:'';width:10px;height:5px;border-left:2px solid var(--accent-ink);border-bottom:2px solid var(--accent-ink);transform:translateY(-1px) rotate(-45deg);opacity:0;transition:opacity .15s}
+.check input:checked+.box{background:var(--accent);border-color:var(--accent)}
+.check input:checked+.box::after{opacity:1}
+.check input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
+.check input:disabled~*{opacity:.45}
+.check:has(input:disabled){cursor:not-allowed}
+.newonly .note{color:var(--ink-3);font-size:.9rem;margin:0;max-width:62ch}
+.hhead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px}
+.history .hhead h2{margin:0}
+.htable .rm{text-align:right;white-space:nowrap;padding-right:0;width:1%}
+.rmbtn{font-size:.85rem;font-weight:600;color:var(--ink-3);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;transition:color .2s}
+.rmbtn:hover{color:var(--bad)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:900px){
+  .welcome{grid-template-columns:1fr}
+  .welcome-aside{display:none}
+  .split{grid-template-columns:1fr}
+  .split .pane{grid-area:1/1}
+  .split[data-view="passage"] .qpane,.split[data-view="questions"] .ppane{visibility:hidden;pointer-events:none}
+  .ppane{border-right:0}
+  .mswitch{display:flex;border-bottom:1px solid var(--rule);background:var(--surface)}
+  .mswitch button{flex:1;height:44px;font-weight:700;color:var(--ink-3);border-bottom:3px solid transparent;transition:color .2s,border-color .3s var(--ease)}
+  .mswitch button.on{color:var(--ink);border-bottom-color:var(--accent)}
+  .tbar{flex-wrap:wrap;height:auto;padding-top:8px;gap:8px}
+  .tabs{order:5;flex-basis:100%;height:46px}
+  .tools{margin-right:auto}
+  .tbl table{min-width:540px}
+  .map{grid-template-columns:minmax(0,1fr) auto}
+  .map .cells{grid-column:1/-1}
+  .score{grid-template-columns:1fr;align-items:start}
+  .trio li{grid-template-columns:48px minmax(0,1fr);gap:14px}
+  .trio .pn{font-size:2rem}
+  .trio .diff{grid-column:2}
+}
+@media (max-width:560px){
+  .bar .who{display:none}
+  .tools .fs{display:none}
+  .timer{font-size:1.1rem}
+  .timer small{display:none}
+  .tab{padding:0 10px}
+  .tab small{display:none}
+  .htable .pas{display:none}
+  .nav .prog{display:none}
+  .actions .btn{flex:1}
+  .actions .hint{flex-basis:100%;margin:0}
+}
+@media (max-width:560px){.wordmark span{display:none}.skills a{padding:0 9px}.skills{margin-left:0}}
+@media (max-width:720px){.bar .skills{flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}.bar .skills::-webkit-scrollbar{display:none}.bar .skills a{flex:none}.bar .spacer{display:none}.bar .who{display:none}}
+@media (max-width:440px){.bar a.wordmark{display:none}.skills a{padding:0 8px;font-size:.9rem}}
+@media (max-width:400px){#screen-results .skills{display:none}}
+@media (max-width:400px){
+  .tbar{gap:6px;padding-left:8px;padding-right:8px}
+  .tbar .btn-primary{height:38px;padding:0 .75em}
+  .tbar .homebtn,.tbar .theme-btn{padding:0 .6em}
+  .timer{padding:0 2px;font-size:1.05rem}
+  .tools{gap:6px}
+  .bar{gap:8px}
+}
+/* ---------- modern layer: blue + sun, minimal, motion ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(18px)}}
+@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes hl{to{background-size:100% var(--hl,.1em)}}
+@keyframes grow{from{transform:scaleY(.15)}}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(-18px,24px)}}
+@keyframes drift{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(14px,-18px) rotate(12deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes sheen{from{background-position:-200% 0}to{background-position:200% 0}}
+html{scroll-behavior:smooth}
+::selection{background:var(--sun);color:var(--sun-ink)}
+*{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+h1,h2,h3{letter-spacing:-.03em}
+/* header */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 84%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.wordmark{display:inline-flex;align-items:center;gap:6px}
+.wordmark span{background:var(--sun);color:var(--sun-ink);padding:2px 10px;border-radius:999px;transition:transform .4s var(--smooth)}
+a.wordmark:hover span,.wordmark:hover span{transform:scale(1.04)}
+.theme-btn{border-radius:999px;padding:0 1em}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+.skills{gap:4px;align-items:center;margin-left:10px}
+.skills a{position:relative;height:36px;padding:0 14px;border:0;margin:0;border-radius:999px;transition:color .25s,background-color .25s,transform .4s var(--smooth)}
+.skills a:hover{background:var(--sunk);transform:translateY(-1px)}
+.skills a.on{background:var(--ink);color:var(--bg)}
+.skills a.on::after{content:"";position:absolute;right:9px;top:7px;width:6px;height:6px;border-radius:50%;background:var(--sun);animation:pop .5s var(--smooth) both}
+/* buttons */
+.btn{border-radius:999px;height:46px;padding:0 1.5em;transition:transform .4s var(--smooth),color .25s,border-color .25s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.96)}
+.btn-primary{}
+.btn-primary::before{background:var(--sun)}
+.btn-primary:hover{color:var(--sun-ink)}
+.btn-line{border:1.5px solid var(--ink-3)}
+.btn-line::before{background:var(--sun)}
+.btn-line:hover{color:var(--sun-ink);border-color:var(--sun)}
+.btn-quiet{height:38px;border-color:var(--rule)}
+.btn-quiet::before{background:var(--sun-tint)}
+.btn-quiet:hover{border-color:var(--sun)}
+.textbtn{text-decoration-color:var(--sun);text-decoration-thickness:2px}
+/* forms */
+.field input{border-radius:7px;height:54px;transition:border-color .2s}
+.field input:focus{outline:3px solid var(--accent-tint)}
+.ans{border-radius:6px 6px 0 0}
+.ans:focus{background:var(--sun-tint)}
+.sel select{border-radius:999px;padding-left:1.1em}
+.sel select:focus{outline:3px solid var(--accent-tint)}
+.check .box{border-radius:4px;transition:background-color .2s,border-color .2s,transform .4s var(--smooth)}
+.check input:checked+.box{transform:scale(1.04)}
+.check:hover .box{border-color:var(--accent)}
+/* welcome */
+.welcome-main h1{font-size:clamp(2.4rem,4.8vw,3.8rem);letter-spacing:-.04em}
+.welcome-main h1,.hub h1,.home h1{background:linear-gradient(var(--sun),var(--sun)) no-repeat 0 100%/0 .1em;--hl:.1em;padding-bottom:.16em;animation:hl .9s .35s var(--ease) forwards;width:fit-content;max-width:100%}
+.welcome-main>*{animation:rise .7s var(--ease) both}
+.welcome-main>h1{animation:rise .7s var(--ease) both,hl .9s .35s var(--ease) forwards}
+.welcome-main>p{animation-delay:.08s}.welcome-main>form{animation-delay:.16s}
+.welcome-aside{position:relative;overflow:hidden;border-left:0;background:var(--surface)}
+.welcome-aside::before{content:"";position:absolute;top:-70px;right:-70px;width:260px;height:260px;border-radius:50%;background:var(--sun);opacity:.9;animation:float 11s ease-in-out infinite}
+.welcome-aside::after{content:"";position:absolute;bottom:-60px;left:-40px;width:200px;height:200px;border-radius:44% 56% 52% 48%;background:var(--accent-tint);animation:drift 13s ease-in-out infinite}
+.welcome-aside>*{position:relative;z-index:1;animation:rise .8s .2s var(--ease) both}
+.sample{background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:22px;border-radius:var(--r-panel);border:1px solid var(--rule)}
+.sample .src mark,.rp mark{background:var(--sun);color:var(--sun-ink);border-radius:4px;padding:0 4px}
+/* home lists */
+.trio{border-top:0;margin-top:30px}
+.trio li{padding:20px 18px;border-bottom:0;border-radius:var(--r-panel);transition:background-color .3s,transform .4s var(--smooth);animation:rise .7s var(--ease) both}
+.trio li:nth-child(2){animation-delay:.07s}.trio li:nth-child(3){animation-delay:.14s}
+.trio li+li{margin-top:6px}
+.trio li:hover{background:var(--surface);transform:translateX(4px);}
+.trio .pn{justify-self:start;background:linear-gradient(var(--sun),var(--sun)) no-repeat 0 100%/0 .12em;--hl:.12em;padding-bottom:.1em;animation:hl .8s .45s var(--ease) forwards;transition:transform .5s var(--smooth)}
+.trio li:hover .pn{transform:scale(1.05)}
+.diff i b{width:7px;border-radius:99px;transform-origin:bottom;animation:grow .6s var(--ease) both}
+.diff i b:nth-child(2){animation-delay:.08s}.diff i b:nth-child(3){animation-delay:.16s}
+.resume{border-color:var(--sun);background:var(--sun-tint);border-width:2px;border-radius:var(--r-panel);animation:rise .6s var(--ease) both}
+.htable th{border-bottom:1px solid var(--rule)}
+.htable tbody tr{transition:background-color .2s}
+.htable tbody tr:hover td{background:var(--sunk)}
+.htable tbody td:first-child{padding-left:10px;border-radius:6px 0 0 6px}.htable tbody td:last-child{border-radius:0 6px 6px 0}
+.htable .band{color:var(--accent)}
+.empty{border-top:0;border-radius:var(--r-panel);background:var(--surface);padding:22px;text-align:center}
+/* hub + page-specific (prefixed to win over page css) */
+html body .skill{position:relative;overflow:hidden;border:1px solid var(--rule);border-top:1px solid var(--rule);border-radius:13px;animation:rise .7s var(--ease) both;transition:transform .5s var(--smooth),border-color .3s}
+html body .skill:nth-child(2){animation-delay:.07s}html body .skill:nth-child(3){animation-delay:.14s}html body .skill:nth-child(4){animation-delay:.21s}
+html body .skill>*{position:relative;z-index:1}
+html body .skill::before{content:"";position:absolute;right:-46px;top:-46px;width:130px;height:130px;border-radius:50%;background:var(--sun);transform:scale(.8);transition:transform .6s var(--smooth)}
+html body .skill:nth-child(even)::before{background:var(--accent);opacity:.9}
+html body .skill:hover{transform:translateY(-4px);border-color:var(--accent)}
+html body .skill:hover::before{transform:scale(1.35)}
+html body .skill h2{font-size:clamp(1.7rem,2.8vw,2.3rem);letter-spacing:-.035em}
+html body .skill .status{color:var(--accent)}
+html body .wprompt,html body .cue{position:relative;border:1px solid var(--rule);border-radius:var(--r-panel);background:var(--surface);padding:22px 24px 22px 32px}
+html body .wprompt::before,html body .cue::before{content:"";position:absolute;left:13px;top:20px;bottom:20px;width:4px;border-radius:4px;background:var(--sun)}
+html body .wfig{border-radius:var(--r-panel)}
+html body .docicon{border-radius:7px}
+html body .essay,html body .notes{border-radius:var(--r-panel)}
+html body .essay:focus,html body .notes:focus{outline:3px solid var(--accent-tint)}
+html body .recbar{border-radius:var(--r-panel)}
+html body .meter{border-radius:99px}
+html body .meter i{border-radius:99px}
+html body .recbar.on{border-color:var(--bad);animation:pulse 1.6s infinite}
+html body .steps span{border:0;border-radius:999px;margin:12px 2px;padding:0 14px}
+html body .steps span.on{background:var(--ink);color:var(--bg)}
+html body .stamps button{border-radius:6px}
+html body .stamps button:hover{background:var(--sun-tint)}
+html body .pbtn{border-radius:999px}
+html body .pbtn.play{}
+html body .pbtn.play:hover{background:var(--sun);border-color:var(--sun);color:var(--sun-ink)}
+html body .pjump button{border-radius:999px}
+html body .seek input[type=range]::-webkit-slider-thumb{background:var(--sun);border:3px solid var(--accent);width:18px;height:18px;margin-top:-6px}
+html body .seek input[type=range]::-moz-range-thumb{background:var(--sun);border:3px solid var(--accent)}
+html body .endnote{background:var(--sun-tint);border-bottom-color:transparent}
+html body .review-audio{border-radius:var(--r-panel)}
+html body .parthead{letter-spacing:-.035em}
+html body .parthead::before{content:"";display:inline-block;width:.5em;height:.5em;border-radius:50%;background:var(--sun);margin-right:.45em;vertical-align:.08em}
+/* test screen */
+.tab{border-radius:6px 6px 0 0;transition:color .2s,background-color .25s}
+.tab:hover{background:var(--sunk)}
+.tab.active{font-weight:800}
+.tab-line{height:4px;border-radius:4px 4px 0 0}
+.sq{border-radius:50%;transition:border-color .2s,color .2s,transform .4s var(--smooth),background-color .2s}
+.sq:hover{background:var(--sun);border-color:var(--sun);color:var(--sun-ink);transform:scale(1.06)}
+.timer{padding:0 14px;margin:9px 0;background:var(--sunk);border-radius:999px;transition:background-color .3s,color .3s}
+.timer.warn{background:var(--sun-tint)}
+.timer.danger{background:var(--bad-tint);animation:pulse 1.4s infinite}
+.timer.over{background:var(--bad-tint)}
+.qsec{border-top:1px solid var(--rule);padding-top:26px}
+.qsec:first-child{border-top:0;padding-top:0}
+.qsec h3{display:flex;align-items:center;gap:.6em}
+.qsec h3::before{content:"";flex:none;width:.9em;height:.32em;border-radius:99px;background:var(--sun)}
+.qitem.flash{background:var(--sun-tint);border-radius:5px}
+.seg button{transition:color .2s,border-color .2s,background-color .25s,transform .4s var(--smooth)}
+.seg button:first-child{border-radius:999px 0 0 999px;padding-left:18px}
+.seg button:last-child{border-radius:0 999px 999px 0;padding-right:18px}
+.seg button::before{background:var(--sun-tint)}
+.seg button:hover{border-color:var(--sun)}
+.opt{border-radius:7px;transition:border-color .2s,transform .4s var(--smooth)}
+.opt:hover{transform:translateX(2px);border-color:var(--sun)}
+.opt::before{background:var(--sun-tint)}
+.opt .l{border-radius:5px;transition:background-color .25s,border-color .25s,color .25s,transform .4s var(--smooth)}
+.opt.on .l{transform:scale(1.05)}
+.gap-n{border-radius:4px;padding:2px 7px;background:var(--accent);color:var(--accent-ink)}
+:root[data-theme="dark"] .gap-n{background:var(--accent)}
+.qn{border-radius:5px;transition:background-color .25s,color .2s,border-color .2s,transform .4s var(--smooth)}
+.qn:hover{transform:translateY(-1px);border-color:var(--sun);color:var(--ink)}
+.qn.done{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.prog{padding:4px 12px;border-radius:999px;background:var(--sunk)}
+.mswitch button.on,.skills a.on{border-bottom-color:transparent}
+.mswitch button.on{border-bottom-color:var(--sun)}
+/* dialogs + toasts */
+.overlay{background:rgba(8,13,36,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.dialog{border-radius:13px;padding:30px;border:1px solid var(--rule);animation:dlg .5s var(--smooth) both}
+@keyframes dlg{from{opacity:0;transform:translateY(24px) scale(.94)}}
+.dialog h3::after{content:"";display:block;width:44px;height:6px;border-radius:99px;background:var(--sun);margin-top:12px}
+.toast{border-radius:999px;padding:12px 20px;animation:tin .5s var(--smooth) both}
+/* results */
+.score{border-bottom-width:1px;border-bottom-color:var(--rule)}
+.bigband{animation:rise .9s var(--ease) both;background:linear-gradient(var(--sun),var(--sun)) no-repeat 0 100%/0 .05em;--hl:.05em;padding-bottom:.08em;animation:rise .9s var(--ease) both,hl 1s .6s var(--ease) forwards;width:fit-content}
+.bandlabel{animation:rise .8s .15s var(--ease) both}
+.save{border-bottom-color:var(--rule)}
+.thumbwrap{border-radius:6px}
+.cell{border-radius:4px}
+.cell:nth-child(2){animation-delay:.02s}.cell:nth-child(3){animation-delay:.04s}.cell:nth-child(4){animation-delay:.06s}.cell:nth-child(5){animation-delay:.08s}.cell:nth-child(6){animation-delay:.1s}.cell:nth-child(7){animation-delay:.12s}.cell:nth-child(8){animation-delay:.14s}.cell:nth-child(9){animation-delay:.16s}.cell:nth-child(10){animation-delay:.18s}
+.cell:hover{transform:scale(1.1)}
+.cell.blank{border-radius:4px}
+.ptext{border-radius:var(--r-panel);overflow:hidden;}
+.ptext:hover{}
+.ptext summary:hover{background:var(--sun-tint)}
+mark.clue{background:var(--sun);color:var(--sun-ink);border-radius:4px}
+.cn{background:var(--sun);color:var(--sun-ink);border-radius:6px;transition:transform .4s var(--smooth)}
+.cn:hover{transform:translateY(-1px)}
+.ritem{border-radius:var(--r-panel);transition:transform .4s var(--smooth)}
+.ritem:hover{transform:translateY(-1px)}
+@supports (animation-timeline:view()){
+  .ritem:not(.flash),.qsec,.map{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 35%}
+}
+.key .k1::before,.key .k2::before,.key .k3::before{border-radius:50%}
+.rpart h3{letter-spacing:-.03em}
+@media (hover:none){.trio li:hover,.opt:hover,html body .skill:hover{transform:none}}
+/* smooth hovers: softer easing on base sweeps and fills */
+.btn,.btn::before,.seg button,.seg button::before,.opt,.opt::before,.qn,.sq,.tab,.skills a,.trio li,.stamps button,.pbtn,.ptext summary,.theme-btn,.ans,.sel select,.field input,.cell,.cn,.ritem,.check .box{transition-timing-function:var(--smooth)!important}
+.btn::before{transition-duration:.5s!important}
+.seg button::before,.opt::before{transition-duration:.45s!important}
+.btn,.seg button,.opt,.qn,.sq,.skills a,.trio li,.pbtn,.theme-btn{transition-duration:.4s!important}
+html body .skill,html body .skill::before{transition-timing-function:var(--smooth)!important}
+html body .skill{transition-duration:.4s!important}
+/* one style for every question number */
+.gap-p{margin-left:-6px}
+.item-n{margin-right:8px;transform:none}
+.mcq-stem{align-items:flex-start}
+.mcq-stem .item-n{flex:none;margin-right:0;margin-top:2px}
+/* hover: boxes and text stay put, only colour/fill changes */
+a.wordmark:hover span,.wordmark:hover span,.skills a:hover,.btn:hover,.trio li:hover,.trio li:hover .pn,.sq:hover,.cell:hover,.cn:hover,.qn:hover,.opt:hover,.ritem:hover,.pbtn:hover,html body .skill:hover,html body .pbtn:hover{transform:none!important}
+.seek input[type=range]:hover::-webkit-slider-thumb{transform:none!important}
+.textbtn:hover{text-underline-offset:3px!important}
+html body .skill::before{content:none!important;display:none!important}
+/* hover speed: 2x faster, zero delay */
+.btn,.btn::before,.seg button,.seg button::before,.opt,.opt::before,.opt .l,.qn,.sq,.tab,.skills a,.trio li,.stamps button,.pbtn,.pjump button,.ptext,.ptext summary,.theme-btn,.ans,.sel select,.field input,.cell,.cn,.ritem,.check .box,.textbtn,.rmbtn,.htable tbody tr,.htable tbody td,.wordmark span,.diff i b,html body .skill,html body .pbtn,html body .stamps button{transition-duration:.2s!important;transition-delay:0s!important}
+.btn::before{transition-duration:.25s!important}
+.seg button::before,.opt::before{transition-duration:.22s!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* ---------- speaking additions ---------- */
+.trio .wtype{color:var(--ink-3);font-size:.92rem;margin-top:4px}
+.wstat .n{font-size:clamp(3.4rem,9vw,6rem);font-weight:800;line-height:.85;letter-spacing:-.04em;color:var(--accent)}
+.wstat .l{font-weight:700;margin-top:12px}
+.wstat .l small{display:block;font-weight:500;color:var(--ink-3);font-size:.85rem}
+.docicon{display:grid;place-items:end start;width:96px;height:130px;border:1px solid var(--rule);background:var(--surface);padding:12px;position:relative}
+.docicon::before{content:"";position:absolute;left:12px;right:12px;top:16px;height:60px;background:repeating-linear-gradient(var(--rule) 0 2px,transparent 2px 10px)}
+.docicon b{font-size:.78rem;font-weight:800;color:var(--accent);letter-spacing:.04em}
+.wsec{margin-top:52px}
+.wsec>h2,.listen>h2{font-size:1.5rem;margin-bottom:12px}
+.wans{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-panel);padding:20px 22px;margin:0 0 14px;line-height:1.75}
+.wans h3{font-size:1rem;margin-bottom:10px}
+.credit{margin-top:48px;color:var(--ink-3);font-size:.8rem}
+@media (max-width:560px){.docicon{width:72px;height:98px}.docicon::before{height:40px}}
+.stage{flex:1;overflow-y:auto;min-height:0}
+.stage-in{max-width:820px;margin:0 auto;padding:clamp(26px,5vw,60px) clamp(18px,4vw,44px) 60px}
+.kicker{font-size:.92rem;font-weight:700;color:var(--ink-3);margin:0 0 20px;display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.kicker b{color:var(--accent);background:var(--accent-tint);padding:3px 11px;border-radius:999px}
+.bigq{font-size:clamp(1.6rem,3.6vw,2.5rem);line-height:1.18;letter-spacing:-.015em;font-weight:800;margin:0 0 30px;max-width:30ch}
+.recbar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;padding:16px 18px;border:1.5px solid var(--rule);border-radius:var(--r-panel);background:var(--surface);margin:0 0 26px}
+.recbar .lab{font-weight:800;letter-spacing:.06em;font-size:.82rem;color:var(--ink-3)}
+.recbar.on .lab{color:var(--bad)}
+.recbar .t{font-weight:800;font-size:1.15rem;min-width:4ch;text-align:right}
+.meter{height:8px;background:var(--sunk);border-radius:2px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--ok);transition:width .08s linear}
+.recbar:not(.on) .meter i{background:var(--ink-3)}
+.cue{border:1.5px solid var(--ink);background:var(--bg);padding:20px 22px;margin:0 0 22px}
+.cue h3{font-size:1.25rem;line-height:1.3;margin:0 0 12px}
+.cue p{margin:0 0 6px;font-weight:600}
+.cue ul{margin:0;padding-left:1.2em}
+.cue li{margin:.2em 0}
+.notes{width:100%;min-height:150px;resize:vertical;padding:14px 16px;border:1.5px solid var(--rule);border-radius:var(--r-ctl);background:var(--surface);color:var(--ink);font:inherit;line-height:1.6}
+.notes:focus{outline:none;border-color:var(--accent)}
+.notes[readonly]{background:var(--sunk)}
+.notelab{display:block;font-weight:700;margin:0 0 8px}
+.prepclock{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px 32px;padding:22px 26px 24px;margin:0 0 20px;border:1px solid var(--rule);border-radius:var(--r-panel);background:var(--surface)}
+.pc-lab{display:block;font-size:.82rem;font-weight:700;color:var(--ink-3);margin-bottom:8px}
+.prepclock .n{font-size:clamp(3rem,8vw,4.6rem);font-weight:800;line-height:1;letter-spacing:-.04em;color:var(--accent);min-width:3.3ch}
+.prepclock p{margin:0;color:var(--ink-2);max-width:42ch}
+.pc-bar{grid-column:1/-1;display:block;height:6px;margin-top:16px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.pc-bar b{display:block;height:100%;width:100%;border-radius:99px;background:var(--accent);transition:width .25s linear,background-color .3s}
+.cue{margin:0 0 22px}
+.cue h3{font-size:1.3rem;line-height:1.3;margin:0 0 16px}
+.cue p{margin:0 0 8px;font-size:.88rem;font-weight:700;color:var(--ink-3)}
+.cue ul{list-style:none;margin:0;padding:0}
+.cue li{position:relative;padding-left:20px;margin:0;line-height:1.5}
+.cue li+li{margin-top:10px}
+.cue li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.stagebtns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.stagebtns .hint{color:var(--ink-3);font-size:.9rem}
+.steps{display:flex;gap:0;align-self:stretch;flex:1;min-width:0}
+.steps span{display:flex;align-items:center;padding:0 14px;font-weight:600;color:var(--ink-3);border-bottom:3px solid transparent;white-space:nowrap}
+.steps span.on{color:var(--ink);border-bottom-color:var(--accent)}
+.miccheck{max-width:620px}
+.miccheck .recbar{margin-top:22px}
+.sstats{display:flex;gap:clamp(20px,4vw,44px)}
+.listen{margin-top:44px}
+.listen audio{width:100%;margin:6px 0 16px}
+.stamps{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.stamps li{border-bottom:1px solid var(--rule)}
+.stamps button{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;width:100%;text-align:left;padding:12px 4px;transition:background-color .2s}
+.stamps button:hover{background:var(--sunk)}
+.stamps .at{font-weight:800;color:var(--accent)}
+.stamps .tp{display:block;font-size:.84rem;color:var(--ink-3);font-weight:600}
+.stamps .d{color:var(--ink-3);font-size:.88rem;white-space:nowrap}
+.stamps li.miss button{cursor:default;color:var(--ink-3)}
+.stamps li.miss .at{color:var(--ink-3)}
+.preview .pn{color:var(--ink-3)}
+@media (max-width:640px){
+  .steps span{padding:0 9px;font-size:.9rem}
+  .recbar{grid-template-columns:auto minmax(0,1fr) auto;gap:10px;padding:12px 14px}
+  .stamps button{grid-template-columns:52px minmax(0,1fr)}
+  .stamps .d{grid-column:2}
+}
+@media (max-width:420px){ .steps{display:none} }
+@media (max-width:560px){ .prepclock{grid-template-columns:1fr;padding:18px 18px 20px} }
+</style>
+<style>/* booklet-layer v2 */
+/* ---------- tokens: paper, graphite, pen ink, highlighter ---------- */
+:root{
+  --bg:#f4f1ea; --surface:#fffdf8; --sunk:#ede8dc; --ink:#1b2130; --ink-2:#4a5163; --ink-3:#686f80;
+  --rule:#e1dacb; --rule-strong:#1b2130;
+  --accent:#1e4db7; --accent-ink:#ffffff; --accent-hover:#163b8f; --accent-tint:#e3eaf8;
+  --sun:#f6dd62; --sun-ink:#1b1600; --sun-tint:#fbf0b8;
+  --ok:#2e7d4f; --ok-tint:#e3f0e6; --ok-rule:#b5d6c0;
+  --bad:#b4322a; --bad-tint:#f8e3e0; --bad-rule:#e6b3ad;
+  --skip:#6b6250; --skip-tint:#efeadf; --skip-rule:#cfc6b2;
+  --warn:#a35a0c;
+  --r-ctl:5px; --r-panel:7px;
+  --pen-line:#9fb3dd;
+}
+:root[data-theme="dark"]{
+  --bg:#151411; --surface:#1d1c18; --sunk:#26241f; --ink:#ece7dc; --ink-2:#bfb8aa; --ink-3:#958e80;
+  --rule:#34312a; --rule-strong:#ece7dc;
+  --accent:#8fb0ff; --accent-ink:#0f1830; --accent-hover:#b0c8ff; --accent-tint:#212a3d;
+  --sun:#e9cc55; --sun-ink:#1b1600; --sun-tint:#3a3420;
+  --ok:#74c493; --ok-tint:#1b2a21; --ok-rule:#335a42;
+  --bad:#ec8378; --bad-tint:#33201d; --bad-rule:#6c3630;
+  --skip:#b5ab96; --skip-tint:#27251f; --skip-rule:#4a463c;
+  --warn:#e8a55a;
+  --pen-line:#4a5d87;
+}
+::selection{background:var(--sun);color:var(--sun-ink)}
+
+/* ---------- header ---------- */
+.bar,.tbar,.nav{background:var(--surface)}
+.bar{background:color-mix(in srgb,var(--surface) 92%,transparent)}
+.wordmark span{background:none;color:var(--accent);padding:0;border-radius:0}
+.skills a{border-radius:var(--r-ctl)}
+.skills a.on{background:var(--ink);color:var(--surface)}
+.skills a.on::after{display:none}
+.theme-btn{border-radius:var(--r-ctl)}
+.theme-btn:hover{border-color:var(--ink);color:var(--ink);background:var(--sunk)}
+
+/* ---------- buttons ---------- */
+.btn{border-radius:var(--r-ctl);height:44px;padding:0 1.3em}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary::before{background:var(--accent-hover)}
+.btn-primary:hover{color:var(--accent-ink)}
+.btn-line{border:1.5px solid var(--rule-strong)}
+.btn-line::before{background:var(--ink)}
+.btn-line:hover{color:var(--surface);border-color:var(--ink)}
+.btn-quiet::before{background:var(--sunk)}
+.btn-quiet:hover{border-color:var(--ink-3)}
+.textbtn{text-decoration-color:var(--accent);text-decoration-thickness:1px}
+.sq{border-radius:var(--r-ctl)}
+.sq:hover{background:var(--sunk);border-color:var(--ink);color:var(--ink);transform:none}
+.sq:active{transform:scale(.94)}
+
+/* ---------- headings: no highlighter on titles ---------- */
+.welcome-main h1,.hub h1,.home h1{background:none!important;padding-bottom:0}
+.welcome-main>h1{animation:rise .7s var(--ease) both}
+.trio .pn{background:none!important;color:var(--ink)}
+.bigband{background:none!important;color:var(--ink)}
+.dialog h3::after{display:none}
+
+/* section labels: tracked caps with a hairline */
+.qsec{border-top:0;padding-top:0}
+.qsec+.qsec,.qsec:not(:first-child){margin-top:34px}
+.qsec h3{font-size:.78rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);gap:.8em}
+.qsec h3::before{display:none}
+.qsec h3::after{content:"";flex:1;height:1px;background:var(--rule)}
+html body .parthead::before{display:none}
+html body .parthead{display:flex;align-items:center;gap:.7em;letter-spacing:-.02em}
+html body .parthead::after{content:"";flex:1;height:1px;background:var(--rule)}
+.history h2,.filter h2{letter-spacing:-.02em}
+
+/* ---------- welcome: a ruled answer sheet ---------- */
+.welcome-aside{background:var(--surface);border-left:1px solid var(--rule);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,color-mix(in srgb,var(--pen-line) 30%,transparent) 31px 32px);
+  background-position:0 18px}
+.welcome-aside::before{display:none}
+.welcome-aside::after{content:"";position:absolute;top:0;bottom:0;left:56px;width:1px;height:auto;background:color-mix(in srgb,var(--bad) 30%,transparent);border-radius:0;animation:none}
+.sample{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:var(--r-panel)}
+.sample .src mark,.rp mark{background:var(--sun);color:var(--sun-ink);border-radius:2px;padding:0 3px}
+
+/* ---------- home ---------- */
+.trio{border-top:1.5px solid var(--rule-strong)}
+.trio li{border-radius:0;border-bottom:1px solid var(--rule);padding:20px 12px}
+.trio li+li{margin-top:0}
+.trio li:hover{background:var(--surface);transform:none}
+.resume{border:1.5px solid var(--accent);background:var(--accent-tint)}
+.htable th{border-bottom:1.5px solid var(--rule-strong);text-transform:uppercase;letter-spacing:.07em;font-size:.74rem}
+.htable .band{color:var(--ink)}
+.empty{background:var(--surface);border:1px dashed var(--rule)}
+
+/* hub cards: booklet covers */
+html body .skill{border-radius:var(--r-panel);border:1px solid var(--rule);border-top:4px solid var(--ink);background:var(--surface)}
+html body .skill::before{display:none}
+html body .skill:hover{transform:translateY(-2px);border-color:var(--ink-3);border-top-color:var(--accent)}
+html body .skill .status{color:var(--accent)}
+
+/* ---------- test chrome: timer leads ---------- */
+.timer{background:transparent;border:1.5px solid var(--rule);border-radius:var(--r-ctl);padding:0 12px;font-size:1.4rem;font-weight:700;letter-spacing:.02em}
+.timer.warn{background:transparent;border-color:var(--warn);color:var(--warn)}
+.timer.danger,.timer.over{background:var(--bad-tint);border-color:var(--bad);color:var(--bad)}
+.tab{border-radius:var(--r-ctl) var(--r-ctl) 0 0}
+.tab-line{height:3px;border-radius:0;background:var(--ink)}
+.prog{background:none;padding:0;color:var(--ink-2)}
+.mswitch button.on{border-bottom-color:var(--ink)}
+
+/* ---------- passage on the sheet ---------- */
+.ppane{background:var(--surface)}
+.passage p{margin:0 0 1.05em;hanging-punctuation:first}
+.ptitle{letter-spacing:-.025em}
+.qpane,.lpane{background:var(--bg)}
+mark.clue{background:var(--sun);color:var(--sun-ink)}
+.cn{background:var(--sun);color:var(--sun-ink);border:1px solid color-mix(in srgb,var(--sun-ink) 25%,transparent)}
+
+/* ---------- question numbers & answers ---------- */
+.gap-n,:root[data-theme="dark"] .gap-n{background:transparent;color:var(--ink);border:1.5px solid var(--ink);border-radius:2px;padding:0 5px;font-size:.72rem;transition:background-color .2s,border-color .2s}
+.gap-n.cur{background:var(--sun);border-color:var(--sun-ink);color:var(--sun-ink)}
+.ans{border-radius:0;border-bottom:1.5px dotted var(--ink-3);color:var(--accent);font-weight:600;background:transparent}
+.ans:hover{border-bottom-color:var(--ink);border-bottom-style:solid}
+.ans:focus{background:color-mix(in srgb,var(--sun) 28%,transparent);border-bottom:2px solid var(--accent)}
+.ans.filled{border-bottom:1.5px solid var(--accent)}
+html body .gapmark{border-bottom:1.5px dotted var(--ink-3)}
+.mcq-stem b{color:var(--ink)}
+.qitem.flash{background:color-mix(in srgb,var(--sun) 40%,transparent);border-radius:3px}
+
+/* options: bubble letters */
+.opt{border-radius:var(--r-ctl)}
+.opt::before{background:var(--sunk)}
+.opt:hover{border-color:var(--ink-3);transform:none}
+.opt .l{border-radius:50%;border:1.5px solid var(--ink-2)}
+.opt.on{border-color:var(--accent)}
+.opt.on::before{background:var(--accent-tint)}
+.opt.on .l{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);transform:none}
+.seg button::before{background:var(--sunk)}
+.seg button:hover{border-color:var(--ink-3)}
+.seg button:first-child{border-radius:var(--r-ctl) 0 0 var(--r-ctl);padding-left:14px}
+.seg button:last-child{border-radius:0 var(--r-ctl) var(--r-ctl) 0;padding-right:14px}
+.sel select,html body .pick select{border-radius:var(--r-ctl)}
+.sel select.filled{border-color:var(--accent);color:var(--accent)}
+.sel{width:fit-content;max-width:100%}
+.check .box{border-radius:3px}
+
+/* navigator: an answer sheet */
+.qnums{gap:6px;padding:4px 2px}
+.qn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink-3);background:var(--surface);color:var(--ink-2);font-size:.76rem}
+.qn:hover{border-color:var(--ink);color:var(--ink);transform:none;background:var(--sunk)}
+.qn:active{transform:scale(.9)}
+.qn.done{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.qn.cur{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.qn.cur:not(.done){border-color:var(--accent);color:var(--accent)}
+
+/* ---------- results ---------- */
+.score{border-bottom:1.5px solid var(--rule-strong)}
+.bandlabel{text-transform:uppercase;letter-spacing:.09em;font-size:.8rem;color:var(--ink-2)}
+.cell{border-radius:50%;font-size:.68rem}
+.cell.correct{background:var(--ok);color:var(--surface)}
+.cell.wrong{background:var(--bad);color:var(--surface)}
+.cell.blank{border-radius:50%}
+.key span::before{border-radius:50%}
+.ritem{border-radius:var(--r-panel);border-left-width:4px}
+.ptext{border-radius:var(--r-panel)}
+
+/* ---------- dialogs, toasts ---------- */
+.overlay{background:rgba(20,18,14,.5)}
+.dialog{border-radius:var(--r-panel)}
+.toast{border-radius:var(--r-ctl)}
+
+/* ---------- listening ---------- */
+html body .pbtn{border-radius:var(--r-ctl)}
+html body .pbtn.play:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+html body .pjump button{border-radius:var(--r-ctl)}
+html body .seek input[type=range]::-webkit-slider-thumb{background:var(--surface);border:3px solid var(--accent)}
+html body .seek input[type=range]::-moz-range-thumb{background:var(--surface);border:3px solid var(--accent)}
+html body .endnote{background:var(--accent-tint)}
+html body .review-audio{border-radius:var(--r-panel)}
+
+/* ---------- writing & speaking ---------- */
+html body .wprompt,html body .cue{border-radius:var(--r-panel)}
+html body .wprompt::before,html body .cue::before{background:var(--ink);width:3px;border-radius:0}
+html body .essay{border-radius:var(--r-panel);background:var(--surface)}
+html body .notes{border-radius:var(--r-panel);background:var(--surface)}
+html body .essay:focus,html body .notes:focus{outline:2px solid var(--accent-tint);border-color:var(--accent)}
+html body .wstat .n,html body .prepclock .n{color:var(--ink)}
+html body .steps span{border-radius:var(--r-ctl)}
+html body .steps span.on{background:var(--ink);color:var(--surface)}
+html body .stamps button{border-radius:var(--r-ctl)}
+html body .stamps button:hover{background:var(--sunk)}
+html body .kicker b{border-radius:var(--r-ctl)}
+html body .wfig{background:#fff}
+@media (prefers-reduced-motion:reduce){.qn,.gap-n,.btn{transition:none}}
+/* ---------- word limits always bold ---------- */
+b.wl{font-weight:800}
+
+/* ---------- desk scene: paper, clipboard, pens, ruler ---------- */
+:root{--kraft:#d6c19c;--kraft-2:#c3aa7e;--metal:#a7a9ad;--wood:#e8d2a8;--deco-shadow:rgba(60,45,20,.10)}
+:root[data-theme="dark"]{--kraft:#4a3f30;--kraft-2:#3b3226;--metal:#6d6f74;--wood:#6a5a40;--deco-shadow:rgba(0,0,0,.35)}
+.screen{position:relative;z-index:1}
+.deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.deco .d{position:absolute;display:block;opacity:0;will-change:transform,opacity;filter:drop-shadow(0 10px 18px var(--deco-shadow))}
+.deco svg{display:block;width:100%;height:auto}
+@media (max-width:899px){.deco{display:none}}
+@media (min-width:1280px) and (max-width:1439px){.deco .d{scale:.85}}
+@media (min-width:900px) and (max-width:1279px){.deco .d{scale:.65}}
+
+</style>
+</head>
+<body>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- home -->
+<section class="screen hidden" id="screen-home">
+  <header class="bar"><a class="wordmark" href="index.html" title="All skills">IELTS <span>practice</span></a><nav class="skills" aria-label="Skill"><a href="reading.html">Reading</a><a href="listening.html">Listening</a><a href="writing.html">Writing</a><a href="speaking.html" class="on" aria-current="page">Speaking</a></nav><div class="spacer"></div><span class="who" id="homeWho"></span><button class="theme-btn" data-theme-toggle>Dark</button></header>
+  <main class="home">
+    <h1 id="homeHello"></h1>
+    <p class="lede" id="homeLede"></p>
+    <div id="resumeBox"></div>
+    <div id="nextBox">
+      <ol class="trio preview" id="trio"></ol>
+      <div class="actions">
+        <button class="btn btn-primary" id="startBtn">Start test</button>
+        <button class="btn btn-line" id="shuffleBtn">Shuffle</button>
+        <span class="hint">You need a microphone and a quiet room. Shuffle picks three different Part 1 topics and a new cue card.</span>
+      </div>
+      <div class="newonly">
+        <label class="check"><input type="checkbox" id="newOnly"><span class="box" aria-hidden="true"></span><span>Only topics and cue cards I have not done before</span></label>
+        <p class="note" id="newOnlyNote" hidden></p>
+      </div>
+    </div>
+    <section class="history">
+      <div class="hhead"><h2>Past attempts</h2><button class="rmbtn" id="clearAll" hidden>Clear all</button></div>
+      <div id="histBox"></div>
+    </section>
+    <p class="credit">MP3 recordings are made with LAME (lame.sourceforge.net), used under the LGPL licence.</p>
+  </main>
+</section>
+
+<!-- test -->
+<section class="screen hidden" id="screen-test">
+  <div class="tbar">
+    <button class="btn btn-quiet homebtn" id="homeFromTest">Home</button>
+    <div class="steps" id="steps"><span data-s="check">Microphone</span><span data-s="p1">Part 1</span><span data-s="p2">Part 2</span></div>
+    <div class="tools"><button class="theme-btn" data-theme-toggle title="Switch light or dark">Dark</button></div>
+    <div class="timer num" id="timer"><small id="timerLbl"></small><span id="timerTxt"></span></div>
+  </div>
+  <div class="stage" id="stage"><div class="stage-in" id="stageIn"></div></div>
+</section>
+
+<!-- results -->
+<section class="screen hidden" id="screen-results">
+  <header class="bar"><a class="wordmark" href="index.html" title="All skills">IELTS <span>practice</span></a><nav class="skills" aria-label="Skill"><a href="reading.html">Reading</a><a href="listening.html">Listening</a><a href="writing.html">Writing</a><a href="speaking.html" class="on" aria-current="page">Speaking</a></nav><div class="spacer"></div><span class="who" id="resWho"></span><button class="btn btn-quiet" id="homeFromResults">Home</button><button class="theme-btn" data-theme-toggle>Dark</button></header>
+  <main class="results" id="results"></main>
+</section>
+
+<script src="config.js"></script>
+<script src="vendor/lame.min.js"></script>
+<script>
+(() => {
+'use strict';
+const SDATA = {"topics":[{"title":"Studies","level":1,"qs":["What subjects are you studying?","Do you like your subject?","Why did you choose to study that subject?","Is it very interesting?","Do you prefer to study in the mornings or in the afternoons?","Are you looking forward to working?","What technology do you use when you study?"],"id":"S1-01"},{"title":"Work","level":1,"qs":["What work do you do?","Why did you choose to do that type of work (or that job)?","Do you like your job?","Do you miss being a student?","What technology do you use at work?","Who helps you the most? And how?"],"id":"S1-02"},{"title":"The area you live in and hometown","level":1,"qs":["Do you like the area that you live in?","Where do you like to go in that area?","Do you know any famous people in your area?","What are some changes in the area recently?","Where is your hometown?","Is that a big city or a small place?","How long have you been living there?","Do you like your hometown?","Is there anything you dislike about it?","What do you like (most) about your hometown?","Do you like living there?","Please describe your hometown a little.","Do you think you will continue living there for a long time?","What’s your hometown famous for?","Did you learn about the history of your hometown at school?","What do you like about it?","What do you not like about it?","How often do you visit your hometown?","What’s the oldest part of your hometown?","Do many people visit your town?","How has your hometown changed over the years?","Are there good transportation links to your town?","Would you recommend the town to people with children?"],"id":"S1-03"},{"title":"Home and accommodation","level":1,"qs":["Do you live in a house or a flat?","Can you describe the place where you live?","How long have you lived there?","Please describe the room you live in?","What part of your home do you like the most?"],"id":"S1-04"},{"title":"Weather","level":1,"qs":["Do you prefer dry or wet weather?","What kind of weather do you like most?","What’s your favourite season?","What kind of weather is typical in your hometown?","How is the weather today?","What’s your favorite kind of weather?","Is there any type of weather you really don’t like?","What is the climate like in your country?","Does the weather affect people’s lives in your country?","Do people change in the summer?","Does bad weather ever affect transport in your country?","Tell me about the weather in your country at different times of the year.","Which time of the year did you enjoy the most when you were a child?","Do you (usually) pay attention to weather forecasts?","Has the weather changed much in your country in recent years?","What’s the weather usually like in your country (or your hometown)?","How is the weather here different from the weather in your home country?","Would you say the weather in your hometown is suitable for working (or studying)?","Would you like to move to a place with different weather?","Does the weather affect the way that you feel?","Do people like the weather in your country?","Do the kinds of outside activities people do in your country change when the weather changes?"],"id":"S1-05"},{"title":"Birthday","level":1,"qs":["What do you usually do on your birthday?","What did you do on your birthday when you were young?","Do you think it is important for you to celebrate your birthday?","Whose birthday do you think is the most important to celebrate in Vietnam?","How do you normally celebrate your birthday now?","Is your birthday now still as important to you as when you were a child?","Do you think it’s important to give someone a card when it’s their birthday?","Do you think the price of gifts/presents is important?"],"id":"S1-06"},{"title":"Public transport","level":1,"qs":["Do you often travel on public transport? (Why/Why not?)","Did you use public transport when you were a child? (Why/Why not?)","Do many people use public transport in your country? (Why/Why not?)","Will you use public transport more in the future? (Why/Why not?)","What kinds of public transport do you have in your country?","What kinds of public transport do most people use?","What is your favorite type of public transport?","What do you do when you are travelling on public transport?","How could public transport in your country be improved?"],"id":"S1-07"},{"title":"Fast food","level":1,"qs":["Do you eat fast food?","What are the different kinds of fast food in Vietnam?"],"id":"S1-08"},{"title":"Friends","level":1,"qs":["Do you prefer to spend time with one friend or with a group of friends?","Do you have a friend you have known for a long time?","What do you usually do with your friends?","Do you often go out with your friends?","How important are friends to you?"],"id":"S1-09"},{"title":"Free time and weekend","level":1,"qs":["Do you like to go to the cinema/movies at weekends? (Why/Why not?)","Who do you go with? Alone or with others?","What do you enjoy doing most on weekends? (Why/Why not?)","Are you planning to do anything special next weekend? (Why/Why not?)","What kinds of activities do you often do in your spare time?","How do you often relax yourself on weekends?","How do your surrounding friends relax?","What do you usually do on the weekend?","What did you do last weekend?","Do you make plans for your weekend?","Do you enjoy your weekends now more than you did when you were a child?"],"id":"S1-10"},{"title":"Chocolate","level":1,"qs":["Do you like eating chocolate? (Why/Why not?)","Did you give chocolate to someone as a gift?","Did you often eat chocolate when you were a child?","When was the first time you ate chocolate?","Why do you think chocolate is popular around the world?","Do you think people use chocolate differently now than in the past?","What’s your favourite flavour of chocolate?","Is chocolate good for our health?","How often do you eat chocolate?","Do you think it is good to use chocolate as gifts to others?"],"id":"S1-11"},{"title":"Daily routine and morning/weekend time","level":1,"qs":["What’s your morning/weekend routine?","Is breakfast important?","Do you have breakfast everyday?","Why is breakfast the most important meal of the day?","Do you want to change your morning routine?","Are there any differences between what you do in the morning now and what you did in the past?","What do you usually do in the evening? (Why?)","Do you spend your evenings in the same way on weekdays and at weekends? (Why/why not?)","How did you spend your evenings when you were younger? (Why/Why not?)","Is there anything you don’t like to do in the evenings? (Why/Why not?)","What is your daily study routine?","Have you ever changed your routine?","Do you think it is important to have a daily routine for your study?","What part of your day do you like best?","Do you like the morning or evening?","What did you do in the evening when you were little? Why?","Do you spend your evenings doing the same things on both weekends and weekdays? Why?"],"id":"S1-12"},{"title":"Colours","level":1,"qs":["What is your favourite colour? (Why?)","Has your favourite colour changed since you were a child?","Do you wear a lot of bright colours?","What colours do you have the most of in your home?","Do colours affect your mood? (Why/Why not?)","Is there a colour you dislike?","Are there any colours that are important in your culture?","Do you pay attention to colour when you buy things?"],"id":"S1-13"},{"title":"Coffee and tea","level":1,"qs":["Do you prefer coffee or tea? (Why?)","How often do you drink coffee or tea?","Do you usually drink it at home or in cafés?","When did you first try coffee or tea?","Is coffee or tea more popular in your country?","Do you ever go to cafés to study or work?","What would you offer a guest who comes to your home?"],"id":"S1-14"},{"title":"Hobby","level":1,"qs":["Do you have the same hobbies as your family members?","Do you have a hobby that you’ve had since childhood?","Did you have any hobbies when you were a child?","Do you have any hobbies?"],"id":"S1-15"},{"title":"Cooking","level":1,"qs":["Do you like cooking? (Why/Why not?)","Who usually cooks in your family?","Did you learn to cook when you were a child?","What was the first dish you learned to make?","How often do you cook at home?","Do you prefer cooking for yourself or for other people?","Is there a dish you would like to learn to cook?","Do you think young people cook less than their parents did? (Why/Why not?)"],"id":"S1-16"},{"title":"Swimming","level":1,"qs":["What’s the difference between swimming in the pool and swimming in the sea?","Where do people in your country like to go swimming?","Is it difficult to learn how to swim?","Do you like swimming?","Where do (or can) people go swimming in your hometown (or, near your home)?","Is swimming very popular in your country?","Why do many people like swimming?"],"id":"S1-17"},{"title":"Relax","level":2,"qs":["What would you do to relax?","Do you think doing sports is a good way to relax?","Do you think vacation is a good time to relax?","Do you think students need more relaxing time?"],"id":"S1-18"},{"title":"Schools","level":2,"qs":["Do you like your school?","Do you think it is a good place to study? Why?","What changes do you want to make in your school?","Where do you go to school?","Do you go to a good school?","Is there anything you want to change about your school?","Do you like your current learning atmosphere?","What are the differences between your school and other schools?"],"id":"S1-19"},{"title":"Shopping","level":2,"qs":["What’s your favourite shop?","Are there any shops near your house?","What kinds of shops are there where you live?","Do you like going to a supermarket or a store?"],"id":"S1-20"},{"title":"Music and musical instruments","level":2,"qs":["Do you like music? Why/Why not?","What type of music do you like to listen to when you are alone? Why?","Has the music that you listen to changed since you were young?","Do you think older and younger generations prefer different types of music?","Is there any music concert that you want to go to?","What music do you like?","What music do you dislike?","Do you often listen to one type of music?","What music do your friends like? Do you enjoy the same type of music?","What is the most popular type of music where you live?","Which singer or musician would you like to see in person?","Which musical instruments do you enjoy listening to?","Have you ever learned to play a musical instrument?","If you could learn a musical instrument, what would it be?","Do you think children should learn to play an instrument at school?","Is it easy to learn an instrument without a teacher?"],"id":"S1-21"},{"title":"Keys","level":2,"qs":["Do you always bring a lot of keys with you?","Have you ever lost your key?","Do you often forget the keys and lock yourself out?","Do you think it’s a good idea to leave your keys with a neighbour?"],"id":"S1-22"},{"title":"Housework","level":2,"qs":["Do you do housework at home?","Which household chores do you dislike most?","How do you share housework with the people you live with?","Did you do chores when you were a child?","How often do you clean your room or home?","Do you think children should do housework? (Why/Why not?)","Would you pay someone to help you with housework?","Do you think technology has made housework easier?"],"id":"S1-23"},{"title":"Reading or newspapers/magazines/books","level":2,"qs":["What is the best age for children to start reading?","Which do you prefer, e-books or paper-books?","How do you usually get news?","How do your friends get news?","Do you talk about news with your friends?","Do you prefer reading newspapers or magazines? (Why?)","Do you think news is easier to read online than in newspapers? (Why/Why not?)","What kinds of information in newspapers or magazines do you find most useful? (Why?)","Which do you prefer, reading books or watching movies?","Have you ever read a novel that has been adapted into a film?","Are your reading habits now different than before?","Do you often read books? When?","Do you read more or less now than when you were younger?","Do you like reading books? Why?","How often do you read?","Do you have many books at home?","Do you prefer to buy books or borrow them?","What are the benefits of reading?","What book would you take on a long journey?","How easy is it for you to read books in English?","Have you given up reading a book recently?","What kind of people like reading and what kind of people don’t like reading very much?","What kinds of books do you like to read?","What is the best book you’ve ever read?","Is reading books a popular activity in your country?","Do you think that electronic books / e-Readers are better than real books?","What type of stories do you like to read about?","Do you think reading a magazine or a newspaper can help you learn a language?","Why do you think some people prefer magazines to newspapers?","Do you often read newspapers?","Do you prefer to read local news or international news?","Which is more popular where you live, newspapers or magazines?","Do many people today read newspapers?","In the future, do you think more people than today will read magazines or fewer people?","Do you think newspapers will be very important to you in the future?"],"id":"S1-24"},{"title":"Animals and pets","level":2,"qs":["Have you ever seen a wild animal? (What was it?/Why not?)","Do you like seeing animals in the zoo? (Why/Why not?)","What is your favourite wild animal? (Why/Why not?)","Are there many wild animals in Vietnam? (Why?)","How important is it to protect wild animals? (Why/Why not?)","Do you often watch TV programs on wild animals? (Why not?)","Do you keep a pet? (Why/Why not?)","Did you have any pets when you were a child? (Why/Why not?)","Do you like animals?","What is your favorite animal?","What types of animals do you have in your country?","What types of animals are kept as pets in your country?","Do you think animals should be kept in zoos?","Do you have any animals in your home as a pet?","Would you like to have a pet in the future?","What types of animals do you think make the best pets?","Why do people have pets?","Should dogs be left in the house alone while their owners are at work?","Is there any type of animal that you think should not be kept as a pet?","Do you have a pet?"],"id":"S1-25"},{"title":"Travelling","level":2,"qs":["Do you like travelling?","How often do you travel?","Who do you like to spend your vacations with friends or family?","Where do you usually go on vacations?","Where was the last place you visited on holiday?","Would you like to go back there again?","What kind of tourist destinations do you usually prefer?","Has a foreign visitor ever stayed at your home?","What’s the best way to save money while travelling?"],"id":"S1-26"},{"title":"Art and drawing","level":2,"qs":["Do you like drawing?","Do you like to go to the gallery?","Did you want to learn more about art?","Did you learn drawing when you were a kid?","Is it important for children to learn art at school?","Have you ever been to the art gallery?","Is it interesting to become an artist?","Are there any paintings on the wall of your home?","What kind of pictures do you like to put up in your home?"],"id":"S1-27"},{"title":"T-shirts","level":2,"qs":["Do you usually wear T-shirts?","Do you like T-shirts with pictures or prints?","Do you think older people who wear T-shirts are fashionable?","Have you ever bought a T-shirt as a souvenir from a holiday/vacation?","How often do you wear T-shirts?","Would you buy T-shirts as souvenirs on vacation?"],"id":"S1-28"},{"title":"Cars and car trip","level":2,"qs":["Did you enjoy travelling by car when you were a kid?","What types of cars do you like?","Do you prefer to be a driver or a passenger?","What do you usually do when there is a traffic jam?","Do you like to travel by car?","When do you travel by car?","Where is the farthest place you have travelled by car?","Do you like to sit in the back or front when travelling by car?"],"id":"S1-29"},{"title":"Library","level":2,"qs":["Do you often go to the library?","Would you ever like to work in a library?","Did you use a library more when you were younger?","How common is it for children to visit libraries in your country?","What do you usually do in the library?","Did you go to the library when you were a child?","Do Vietnamese kids often go to the library?"],"id":"S1-30"},{"title":"Watches","level":2,"qs":["Did you wear a watch when you were a child? (Why/Why not?)","Have you ever received a watch as a gift? (When/Who from?)","Do you usually wear a watch now? (Why/Why not?)","Why do you think some people like to wear expensive watches?","Do you think it is important to wear a watch? Why?","Do you wear a watch?"],"id":"S1-31"},{"title":"Sports and doing sports","level":2,"qs":["Did you do any sport when you were younger? (Why/Why not?)","Have you ever supported a sports team? (Why/Why not?)","Do you enjoy watching sports? (Why/Why not?)","Do you think there is too much sport on television in your country? (Why/Why not?)","Do you like watching sports programs on TV?","Do you like to watch live sports games?","Who do you like to watch sports games with?","What kinds of games do you expect to watch in the future?","What sports do you like?","Where did you learn how to do it?","Do you think students need more exercise?"],"id":"S1-32"},{"title":"Taking photos","level":2,"qs":["Do you take photos by camera or phone?","How to deal with pictures after you take them?","Do you want to learn photography to improve your skills of taking photos?","How will people in the future take photos?","Is it good to reserve photos in a cell phone?","Do you like taking photos?","Do you like taking selfies?","What is your favorite family photo?","Do you want to improve your photography skills?"],"id":"S1-33"},{"title":"Jewellery","level":2,"qs":["Do you often wear jewellery?","What type of jewellery do you like?","Have you ever given jewellery to someone as a gift?","Why do you think some people wear a piece of jewellery for a long time?","Do you usually buy jewellery?"],"id":"S1-34"},{"title":"Outdoor activities","level":2,"qs":["Do you like outdoor activities?","Do you often take part in outdoor activities?","What outdoor activities do you like the most?","Are outdoor activities popular in your country?","Do you think people in your country spend enough time being outdoors?","What outdoor sports do you like?","How much time do you spend outdoors every week?","What types of outdoor activities are popular in your country?"],"id":"S1-35"},{"title":"TV programs","level":2,"qs":["What kinds of TV programs do you often watch?","Do you think kids are watching too much television?","What are the impacts of watching TV programs on children?","What kinds of TV programs do you think should be broadcast more?","Do you like watching TV?","How often do you watch TV?","What kind of TV programmes do you like to watch?","What is your favorite TV show now?","What was your favorite show when you were a child?","What are the most popular TV shows in your country?","Do you like watching TV shows from other countries?","Has the internet affected your viewing habits?","How many hours a day do you spend watching television?","Do you think children in your country watch too much television?","Do you think television is useful for education in schools?"],"id":"S1-36"},{"title":"Neighbours","level":2,"qs":["Do you know your neighbours?","What do you think of your neighbours?","How do you get along well with your neighbours?","Do you think it’s important to have a good relationship with one’s neighbours?","Do you know the people who live next door to you?","How often do you see each other?","What kind of relationship do you have?","How can neighbors be helpful to one another?","What kind of problems can people have with their neighbors in a big city?"],"id":"S1-37"},{"title":"Plants and flowers","level":2,"qs":["Do you like flowers? (Why/Why not?)","Are flowers popular as gifts in your country?","Do you have any plants at home?","Did you grow plants when you were a child?","Do you know how to take care of plants?","Which flowers are popular in your country?","Do you think more people should grow plants in cities?","Would you like to have a garden in the future?"],"id":"S1-38"},{"title":"Cinema and movies","level":2,"qs":["What type of movies do you like?","Do you often go to the cinema?","Do you like watching movies in the cinema or at home?","Did you usually go to the cinema when you were a kid?","Do you usually go to the cinema with your friends?","Do you still enjoy watching the movies you loved as a child?","Do you prefer watching movies at home or at the cinema?"],"id":"S1-39"},{"title":"Relatives","level":2,"qs":["Do you often visit your relatives?","What do you do when you visit them?","Do you prefer to spend time with your relatives, or your friends?","Do you take anything when you visit your relatives?","What are some of the most irritating/embarrassing questions your relatives have asked you?"],"id":"S1-40"},{"title":"Dancing","level":2,"qs":["Do you like dancing? (Why/Why not?)","Have you ever taken a dance class?","Do people in your country dance at parties or celebrations?","What kinds of dance are popular in your country?","Did you dance when you were a child?","Do you prefer dancing or watching other people dance?","Do you think dancing is good for your health?","Is traditional dancing still popular among young people?"],"id":"S1-41"},{"title":"Street market","level":2,"qs":["What do people usually buy on the street market?","Do you prefer to go shopping in the shopping mall or on the street market?","When was the last time you went to a street market?","Are there many street markets in Vietnam?"],"id":"S1-42"},{"title":"Mobile phone","level":2,"qs":["Do you remember your first mobile phone?","Do you often use your mobile phone for texting or making phone calls?","How has your mobile phone changed your life?","What was your first mobile phone?","Will you buy a new one in the future?"],"id":"S1-43"},{"title":"Collecting things","level":3,"qs":["Do you collect things?","Are there any things you keep from childhood?","Would you keep old things for a long time? Why?","Where do you usually keep things you need?"],"id":"S1-44"},{"title":"Spending time by yourself and exciting activities","level":3,"qs":["Do you like to spend time by yourself or with your friends? Why?","When was the last time you spent time by yourself?","Do you want to spend more time by yourself?","Have you ever tried any exciting activities?","What was the interesting thing that you did when you were a child?","Have you joined in any interesting activities recently?","Would you like to try climbing or diving?","Can you compare some exciting activities people do now with activities people did 20 years ago?","Why do some people enjoy doing dangerous sports?","Do you think some dangerous activities should be banned?","Should people try doing new things?","What problems can people have when they try new activities for the first time?","Do you think it’s best to do new things on your own or with other people?"],"id":"S1-45"},{"title":"Writing and handwriting","level":3,"qs":["Did you like writing when you were a child? Why/Why not?","What kinds of things do you write during a typical day? Why/Why not?","Do you think the kinds of things you write will change in the future? Why/Why not?","Do you prefer typing or writing things by hand? Why?","Do you like to write by hand?","Do you think handwriting is important?","What is the difference between handwriting and typing?"],"id":"S1-46"},{"title":"Sharing","level":3,"qs":["Do you have anything to share with others recently?","Did your parents teach you to share when you were a child?","What kind of things do you like to share with others?","What kind of things are not suitable for sharing?"],"id":"S1-47"},{"title":"Old buildings","level":3,"qs":["Are there any old buildings you want to see in the future? Why?","Do you prefer living in an old building or a modern house?","Do you think we should preserve old buildings in cities?","Have you ever seen old buildings in the city?"],"id":"S1-48"},{"title":"Outer space and stars","level":3,"qs":["Do you learn about outer space at school?","Do you enjoy watching films about outer space and stars?","Do you want to study outer space and stars?","Do you want to travel to outer space in the future?","Have you ever learnt about outer space and stars?","Do you think it’s important to study the stars?","Would you like to travel to outer space?","How important is studying the stars considered in your country?","Do you often look at the sky?","Can you see the moon and stars at night where you live?","Do you prefer the sky in the morning or the sky at night?","Is there a good place to look at the sky where you live?"],"id":"S1-49"},{"title":"Talents","level":3,"qs":["Do you think anyone in your family has the same talent?","Do you think your talent can be useful for your future work? Why?","Was it mastered recently or when you were young?","Do you have a talent or something you are good at?"],"id":"S1-50"},{"title":"Internet and websites","level":3,"qs":["When did you start using the internet?","How often will you use the internet?","Do you use the internet much during the day?","How does the internet influence people?","What would you do without the internet?","What kinds of websites do you often visit?","What is your favorite website?","Are there any changes about the websites you often visit?","What kinds of websites are popular in your country?"],"id":"S1-51"},{"title":"Small businesses","level":3,"qs":["Are there any famous small businesses in the area you live in?","Do you prefer buying things from small or big companies?","Have you ever worked in small businesses?","Have you ever thought about starting your own business?","How often do you shop at small businesses?","Do you prefer buying things from small businesses or big businesses?","Are there many small businesses where you live?","Would you prefer to work for a small business or a large business?"],"id":"S1-52"},{"title":"Lost and found","level":3,"qs":["What will you do if you find something lost by others?","Do you report to the police when finding something lost by others? Why?","Have you ever lost things?","Will you post on social media if you lose your item?"],"id":"S1-53"},{"title":"Computers and tablets","level":3,"qs":["What do you most often use a computer or a tablet for? (Why/Why not?)","Can you remember when you first started using a computer or tablet? (When/Why not?)","Do you sometimes find computers or tablets difficult to use? (Why/Why not?)","How would your life be different if there were no computers? (Why/Why not?)","In what conditions would it be difficult for you to use a computer?","What would your life be like without computers?","When was the first time you used a computer?","In what conditions would you use a computer?","What are the most popular electronic devices in today’s world?","What devices do you think will be popular in the future?","Do you think people spend too much money on electronic devices?","In what ways can electronic devices make our lives harder?","What would the world be like without computers?","Should children be taught to use computers at school?"],"id":"S1-54"},{"title":"Languages","level":3,"qs":["What languages do you speak? (Why?)","Do you think English is an easy or a difficult language to learn? (Why?)","How did you learn English?","How are languages taught and learned in your school?","Would you like to learn any other languages? (Why/Why not?)","What languages can you speak?","What languages would you like to learn in the future?","How do you learn a foreign language?"],"id":"S1-55"},{"title":"Staying up late","level":3,"qs":["Do you often stay up late at night? (Why/Why not?)","Did you stay up late more often when you were younger? (Why/Why not?)","What do you generally do when you stay up late? (Why/Why not?)","How do you feel the day after you have stayed up late? (Why?)","How often do you stay up late?","Did you stay up late when you were a kid?","What does it feel like the next morning when you stay up late?"],"id":"S1-56"},{"title":"Sitting down","level":3,"qs":["Do you find it easy to fall asleep when sitting on a sofa?","When you were a kid, did you usually sit on the floor?","Do you feel sleepy when you are sitting down?","Do you always sit down for a long time?","Where is your favorite place to sit?"],"id":"S1-57"},{"title":"Happy things","level":3,"qs":["Is there anything that has made you feel happy lately?","What made you happy when you were little?","What hobbies or activities make you feel happy now?","Do you think people are happy when buying new things?","What do you think will make you happy in the future?","When do you feel happy at work? Why?","Do you feel happy when buying new things?"],"id":"S1-58"},{"title":"Noise","level":3,"qs":["Is the area where you live noisy or quiet?","What sounds do you hear most often at home?","Do you prefer quiet places or lively places? (Why?)","Does noise affect your sleep?","Are there any noises that you find annoying?","Do you think cities are noisier than they used to be?","What can people do to reduce noise in their area?"],"id":"S1-59"},{"title":"Mirrors","level":3,"qs":["Do you like looking at yourself in the mirror? How often?","Have you ever bought mirrors?","Do you usually take a mirror with you?","Would you use mirrors to decorate your room?"],"id":"S1-60"},{"title":"Emails","level":3,"qs":["Do you often send emails?","When would you send emails to others?","Is sending emails popular in Vietnam?","Do you think sending emails will be more or less popular in the future?"],"id":"S1-61"},{"title":"Feeling bored and boring things","level":3,"qs":["Do you think childhood is boring or adulthood is boring?","What do you do when you feel bored?","When would you feel bored?","Do you often feel bored?","What kinds of things are boring to you?","What was the most boring thing you did when you were young?","Do you think school is boring?","Did you find school boring when you were a child?","What sort of things do you find most boring now?","What do you do to stop yourself feeling bored?"],"id":"S1-62"},{"title":"Patience and politeness","level":4,"qs":["What do you think patience is?","Do you think patience is important?","Do you think you are a patient person?","Have you ever lost your patience?","Are you a polite person?","Who taught you to be polite?","Is it important to be polite?","What do you do if others are not polite to you?","How do Indian people show politeness?","Has the way people show politeness changed in India?","Are you angry with people who are late?"],"id":"S1-63"},{"title":"Making plans and time management","level":4,"qs":["Do you usually make plans?","What about your time management ability?","Is it easy to manage time for you?","Do you like planning things?","Why can’t you make plans?","Do you like doing things step by step or making a long term plan?","How do you plan your time in a day?","When do you find it hard to allocate time?","Do you like being busy?"],"id":"S1-64"},{"title":"Advertisement","level":4,"qs":["What kind of advertising do you like?","Do you like advertisements?","Do you see a lot of advertising on trains or other transport?","Is there an advertisement that made an impression on you when you were a child?","Will you buy something because of an advertisement?","How do you feel when you see pop-up ads on the internet?","Do you like funny or serious advertisements?","What makes a good advertisement?","Are you interested in watching TV advertisements or internet advertisements?","Do you share advertisements with others?","Do you want to work in advertising in the future?"],"id":"S1-65"},{"title":"Memory","level":4,"qs":["Do you need to remember things often?","Are you good at memorising things?","Have you ever forgotten something important?","Why do some people have good memories while others don’t?","Why do more people rely on cell phones to memorise things?"],"id":"S1-66"},{"title":"Geography","level":4,"qs":["Do you like Geography?","Do you think learning Geography is useful?","Did you learn Geography when you were at school?","Were you good at geography?","Do you want to be a geography teacher?"],"id":"S1-67"},{"title":"Dreams","level":4,"qs":["Can you remember the dreams you had?","Do you share your dreams with others?","Do you think dreams have a special meaning?","Do you want to make your dreams come true?"],"id":"S1-68"},{"title":"Science","level":4,"qs":["Do/did you enjoy science lessons at school? (Why/Why not?)","What is the science subject you are most interested in? (Why?)","Is it easy for you to learn science subjects? (Why/Why not?)","Do you watch science programmes on TV? (Why/Why not?)","Are science museums popular in…./your country? (Why/Why not?)"],"id":"S1-69"},{"title":"Law","level":4,"qs":["Do you think law and order are important?","Who department is most responsible for enforcing the law?","Is there any law you think is too strict? (Why?/Why not?)"],"id":"S1-70"},{"title":"History","level":4,"qs":["Do you like history as a subject in your school? Why?","When was the last time you read a book about history?","Have you visited any history museums?","Do you like watching documentaries/movies related to history?","What historical event do you find most interesting?","Do you think history is important?","Do you like to watch programs on TV about history?","Do you think the internet is a good place to learn about history?"],"id":"S1-71"},{"title":"Numbers and maths","level":4,"qs":["What numbers do you like?","What numbers are important to you?","Are you good at remembering telephone numbers?","Do you need to use numbers in the future?","Do you like learning Maths?","Do you think it’s difficult to learn Maths well?","Do you think math is difficult?","What can people do with math in their daily life?","Do you learn math now? Why/Why not?","Do students learn math in secondary schools in your country?"],"id":"S1-72"}],"cards":[{"title":"Describe a special day out which didn’t cost very much.","level":1,"say":["Where and when you went","What you did","What you spent money on","And explain why you enjoyed this special day out"],"lead":"You should say:","id":"S2-001"},{"title":"Describe a time when someone gave you something that you really wanted.","level":1,"say":["What it was","When you received it","Who gave it to you","And explain why you wanted it so much"],"lead":"You should say:","id":"S2-002"},{"title":"Describe a crowded place you went to.","level":1,"say":["Where it was","When you went there","Who you went there with","What you did there","And how you felt about it"],"lead":"You should say:","id":"S2-003"},{"title":"Describe a sport that you only have watched before but had not played by yourself.","level":1,"say":["What it is","When you watched it","Where you watched it","Who you watched it with","And explain how you felt about it"],"lead":"You should say:","id":"S2-004"},{"title":"Describe a movie you watched and enjoyed recently.","level":1,"say":["When and where you watched it","Who you watched it with","What it was about","And explain why you watched this movie"],"lead":"You should say:","id":"S2-005"},{"title":"Describe a time you visited a new place.","level":1,"say":["Where the new place is","When you went there","Why you went there","And explain how you feel about the place"],"lead":"You should say:","id":"S2-006"},{"title":"Describe your favourite food at a traditional festival or a special event in your country.","level":1,"say":["What it is","At which festival/event you eat it","How it is made","And explain why you like it"],"lead":"You should say:","id":"S2-007"},{"title":"Describe a time when you received money as a gift (birthday, wedding).","level":1,"say":["When it happened","Who gave you money","Why he/she gave you money","And explain how you felt about it"],"lead":"You should say:","id":"S2-008"},{"title":"Describe a public park or garden.","level":1,"say":["Where it is","What it is like","How often you go there","What you often do there","And explain how you feel about it"],"lead":"You should say:","id":"S2-009"},{"title":"Describe a person who likes to make things by hand (e.g. toys, furniture).","level":1,"say":["Who this person is","What he/she makes","Why he/she likes to make things by hand","And explain how you feel about the person"],"lead":"You should say:","id":"S2-010"},{"title":"Describe an occasion when you wore your best clothes.","level":1,"say":["What this occasion was","What clothes you wore","Why you chose to wear these clothes","And explain how you felt about wearing your best clothes"],"lead":"You should say:","id":"S2-011"},{"title":"Describe a place in your hometown/city that is different from other places and that you enjoy visiting with your parents/friends.","level":1,"say":["Where it is","What it is like","What you often do there","Who you often go there with","And explain why you think it is different"],"lead":"You should say:","id":"S2-012"},{"title":"Describe a story someone told you and you remember.","level":1,"say":["What the story was about","Who told you this story","Why you remember it","And how you feel about it"],"lead":"You should say:","id":"S2-013"},{"title":"Describe a person who likes to read a lot.","level":1,"say":["Who this person is","How you knew him/her","What he/she likes to read","And explain why you think he/she likes to read a lot"],"lead":"You should say:","id":"S2-014"},{"title":"Describe a noisy place you have been to.","level":1,"say":["What it is","When you went there","What you did there","And explain why you feel it’s a noisy place"],"lead":"You should say:","id":"S2-015"},{"title":"Describe an indoor or outdoor place where it is easy for you to study.","level":1,"say":["Where it is","What it is like","When you go there","What you study there","And explain why you would like to study in this place"],"lead":"You should say:","id":"S2-016"},{"title":"Describe a person who thinks music is important and enjoys music.","level":1,"say":["Who this person is","How you knew him/her","What music he/she likes","Why he/she thinks music is important","And explain how you feel about him/her"],"lead":"You should say:","id":"S2-017"},{"title":"Describe a place you visited with your friends where you had a good time.","level":1,"say":["What the place is","Who you went with","When you went there","And explain why you think it is a good time"],"lead":"You should say:","id":"S2-018"},{"title":"Describe a picture/photograph of you that you like.","level":1,"say":["Where it was taken/drawn","When it was taken/drawn","Who took/drew it","And explain how you felt about it"],"lead":"You should say:","id":"S2-019"},{"title":"Describe a person who you are happy to know.","level":1,"say":["Who this person is","How long you have known this person","What you do when you are with this person","And explain why you are happy to know this person"],"lead":"You should say:","id":"S2-020"},{"title":"Describe an interesting place in your country that not many people visit.","level":1,"say":["Where the place is","How you got to know about this place","Why only very few people visit there","And explain how you feel about this place"],"lead":"You should say:","id":"S2-021"},{"title":"Describe something that you can’t live without (not a computer/phone).","level":1,"say":["What it is","What you do with it","How it helps you in your life","And explain why you can’t live without it"],"lead":"You should say:","id":"S2-022"},{"title":"Describe a person you only met once recently and want to know more about.","level":1,"say":["Who he/she is","When you met him/her","Why you want to know more about him/her","And explain how you feel about him/her"],"lead":"You should say:","id":"S2-023"},{"title":"Describe another city you would like to stay for a short time.","level":1,"say":["Where the city is","Why you want to go there","Whom you will go there with","What you will do there","And explain why you will stay there just for a short time"],"lead":"You should say:","id":"S2-024"},{"title":"Describe a film character played by an actor or actress whom you admire.","level":1,"say":["Who he/she is","What he/she looks like","What kind of movies she/he appears in","And explain why you admire this person"],"lead":"You should say:","id":"S2-025"},{"title":"Describe an adventurous person that you know.","level":1,"say":["Who the person is","How you know this person","What this person does that is adventurous","And explain why you think this person likes to take risks"],"lead":"You should say:","id":"S2-026"},{"title":"Describe the place where you took photos more than once.","level":1,"say":["What the place is","How often you take photos there","What you photograph there","And explain why you like to take photos there"],"lead":"You should say:","id":"S2-027"},{"title":"Describe a party that you enjoyed.","level":1,"say":["When and where the party was held","Who attended the party","What kind of party it was","What you did in the party","And explain why you enjoyed this party"],"lead":"You should say:","id":"S2-028"},{"title":"Describe a person you have met who you want to work or study with.","level":1,"say":["Who this person is","How you met this person","How long you have known him/her","And explain why you want to work/study with him/her"],"lead":"You should say:","id":"S2-029"},{"title":"Describe an interesting animal you have seen.","level":1,"say":["What animal it was","When and where you saw it","And explain how you feel about this animal"],"lead":"You should say:","id":"S2-030"},{"title":"Describe a daily routine that you enjoy.","level":1,"say":["What it is","Where and when you do it","Who you do it with","And explain why you enjoy it"],"lead":"You should say:","id":"S2-031"},{"title":"Describe an interesting person you met.","level":1,"say":["Who this person is","Where/when you met this person","What you did with this person","And explain why you think this person is interesting"],"lead":"You should say:","id":"S2-032"},{"title":"Describe a small shop or store you often go to.","level":1,"say":["Where it is","What type of people go there","What types of goods are sold there","And explain why you go there and like/dislike most about it"],"lead":"You should say:","id":"S2-033"},{"title":"Describe a restaurant that you like to go to with your family or friends.","level":1,"say":["Where is it?","Why did you choose this restaurant?","What kind of food do you like there?","And explain why you enjoyed eating in this restaurant"],"lead":"You should say:","id":"S2-034"},{"title":"Describe your favorite singer or actor.","level":1,"say":["Who he/she is","What his/her personality is like","What kind of style his/her music/acting belongs to","And explain why you like him/her"],"lead":"You should say:","id":"S2-035"},{"title":"Describe a city you think is very interesting.","level":1,"say":["What it is","What it is famous for","How you knew this city","And explain why you think it is very interesting"],"lead":"You should say:","id":"S2-036"},{"title":"Describe a gift you would like to buy for your friend.","level":1,"say":["How you knew your friend","How long you have known him/her","How you would choose a gift for him/her","And explain why you would choose that gift for him/her"],"lead":"You should say:","id":"S2-037"},{"title":"Describe something that you did with someone/a group of people.","level":1,"say":["What it was","Who you did it with","How long it took you to do this","And explain why you did it with one or more people"],"lead":"You should say:","id":"S2-038"},{"title":"Describe an interesting place you have been to with a friend.","level":1,"say":["What and where the place is","Who you went with","When you went there","What you did there","And explain why you think it is interesting"],"lead":"You should say:","id":"S2-039"},{"title":"Describe an interesting song.","level":1,"say":["What the song is","What story the song tells","Whether the song is popular","And explain why you think it is interesting"],"lead":"You should say:","id":"S2-040"},{"title":"Describe an interesting discussion you had with your friend.","level":1,"say":["What the discussion was about","What opinions you and your friends had","What the conversation was about","And explain why you think it was interesting"],"lead":"You should say:","id":"S2-041"},{"title":"Describe a long walk you had.","level":1,"say":["When this happened","Where you walked","Who you were with","And explain how you felt about this long walk"],"lead":"You should say:","id":"S2-042"},{"title":"Describe a toy you liked in your childhood.","level":1,"say":["What kind of toy it is","When you received it","How you played it","And how you felt about it"],"lead":"You should say:","id":"S2-043"},{"title":"Describe a person who is good at making people feel welcome in his/her home.","level":1,"say":["Who this person is","When and how you met him/her","How he/she welcomes visitors","And explain why you think he/she is good at welcoming visitors"],"lead":"You should say:","id":"S2-044"},{"title":"Describe an enjoyable journey by public transport.","level":1,"say":["Where you went","Who you were with","What you did","And how you felt about it"],"lead":"You should say:","id":"S2-045"},{"title":"Describe an item of clothing that someone gave you.","level":1,"say":["What the clothing was","Who gave it to you","When you got it","And explain why this person gave the clothing"],"lead":"You should say:","id":"S2-046"},{"title":"Describe a family member who you want to work with in the future.","level":1,"say":["Who he/she is","Whether you worked together before","What kind of work you would like to do with him/her","And explain how you feel about this family member"],"lead":"You should say:","id":"S2-047"},{"title":"Describe a quiet place you like to spend your time in.","level":1,"say":["Where it is","How you knew it and how often you go there","What you do there","And explain why you like the place"],"lead":"You should say:","id":"S2-048"},{"title":"Describe a special meal someone cooked for you.","level":1,"say":["Who it was","What meal it was","Why he/she cooked a special meal for you","And explain how you felt about it"],"lead":"You should say:","id":"S2-049"},{"title":"Describe a person you met at a party who you enjoyed talking with.","level":1,"say":["What party it was","Who this person is","What you talked about","And explain why you enjoyed talking with him/her"],"lead":"You should say:","id":"S2-050"},{"title":"Describe a time you bought something from a street (or outdoor) market.","level":1,"say":["When it was","Where the market was","What you bought","And how you felt about it"],"lead":"You should say:","id":"S2-051"},{"title":"Describe a festival or celebration you enjoyed.","level":1,"say":["What the festival or celebration was","Where and when it took place","Who you celebrated it with","And explain why you enjoyed it so much"],"lead":"You should say:","id":"S2-052"},{"title":"Describe an interesting old person you have met.","level":1,"say":["Who this person is","When/where you met this person","What you did with this person","And explain why you think this person is interesting"],"lead":"You should say:","id":"S2-053"},{"title":"Describe your favourite place in your house where you can relax.","level":1,"say":["Where it is","What it is like","What you enjoy doing there","And explain why you like this place"],"lead":"You should say:","id":"S2-054"},{"title":"Describe an unusual meal you had.","level":1,"say":["When you had it","Where you had it","Whom you had it with","And explain why it was unusual"],"lead":"You should say:","id":"S2-055"},{"title":"Describe someone else’s room you enjoy spending time in.","level":1,"say":["When you visited there","Whose room it is","What it is like","What you can do in it","And explain why you enjoy spending time there"],"lead":"You should say:","id":"S2-056"},{"title":"Describe a special cake you received from others.","level":1,"say":["When it happened","Where it happened","Who you got the cake from","And explain why it’s a special cake"],"lead":"You should say:","id":"S2-057"},{"title":"Describe someone you really like to spend time with.","level":1,"say":["Who this person is","How you knew him/her","What you usually do together","And explain why you like to spend time with him/her"],"lead":"You should say:","id":"S2-058"},{"title":"Describe a food of another country you would like to try.","level":1,"say":["What it is","Where you can eat it","How you know about this food","And explain why you would like to try it"],"lead":"You should say:","id":"S2-059"},{"title":"Describe a child that you know.","level":1,"say":["Who this child is and how often you see him or her","How old this child is","What he or she is like","And explain what you feel about this child"],"lead":"You should say:","id":"S2-060"},{"title":"Describe a piece of good news that you heard about someone you know well.","level":2,"say":["What it was","When you heard it","How you knew it","And explain how you felt about it"],"lead":"You should say:","id":"S2-061"},{"title":"Describe a time when you organized a happy event successfully.","level":2,"say":["What the event was","How you prepared for it","Who helped you to organize it","And explain why you think it was a successful event"],"lead":"You should say:","id":"S2-062"},{"title":"Describe a website you often visit.","level":2,"say":["What it is about","How you found out about it","How often you visit it","And explain why you often visit it"],"lead":"You should say:","id":"S2-063"},{"title":"Describe something you did in your study/work that has made you feel confident.","level":2,"say":["When and where it happened","What you did","Why it made you feel confident","And explain how you felt about it"],"lead":"You should say:","id":"S2-064"},{"title":"Describe a vehicle you would like to buy.","level":2,"say":["What kind of vehicle","Why you would like to have it","How you would get it","And explain why you would prefer this means of transport"],"lead":"You should say:","id":"S2-065"},{"title":"Describe something that was broken in your home and then repaired.","level":2,"say":["What it is","How it was broken","How you got it repaired","And how you felt about it"],"lead":"You should say:","id":"S2-066"},{"title":"Describe an old friend you had lost touch with and got in contact with again.","level":2,"say":["Who he/she is","How you knew each other","Why you lost contact","How you got in contact again","And explain how you felt after getting in contact again"],"lead":"You should say:","id":"S2-067"},{"title":"Describe a thing you did to learn another language.","level":2,"say":["What language you learned","What you did","How it helped you learn the language","And how you felt about it"],"lead":"You should say:","id":"S2-068"},{"title":"Describe a time when you answered a phone call from someone you didn’t know in a public place.","level":2,"say":["When and where it happened","Who called you","What he/she said","How you responded","And explain how you felt about the experience"],"lead":"You should say:","id":"S2-069"},{"title":"Describe something kind that someone did for you.","level":2,"say":["Who this person was","Where and when it happened","And explain how you felt after they did this"],"lead":"You should say:","id":"S2-070"},{"title":"Describe a piece of technology that you feel difficult to use.","level":2,"say":["When you got it","What you got it for","How often you use it","And explain how you feel about it"],"lead":"You should say:","id":"S2-071"},{"title":"Describe an occasion when two of your friends had a disagreement.","level":2,"say":["What they argued about","Why they argued with each other","What happened at the end","How you felt about it"],"lead":"You should say:","id":"S2-072"},{"title":"Describe a time when you lost an important and valuable item.","level":2,"say":["When and where it happened","What it was","How important and valuable it was","How you lost it","And explain how you felt about the experience"],"lead":"You should say:","id":"S2-073"},{"title":"Describe a time when you felt proud of a family member.","level":2,"say":["When it happened","Who the person is","What the person did","And explain why you felt proud of him/her"],"lead":"You should say:","id":"S2-074"},{"title":"Describe something you did that made you feel proud.","level":2,"say":["What it was","How you did it","How difficult it was","And explain why you felt proud of it"],"lead":"You should say:","id":"S2-075"},{"title":"Describe a time you taught something new to a younger person.","level":2,"say":["When it was","What it was","Who you showed it to","How you showed it","Why you showed it","And explain how you felt about it"],"lead":"You should say:","id":"S2-076"},{"title":"Describe an occasion when you helped a family member/relative with something.","level":2,"say":["When it happened","Who you helped","How you helped","And explain how you felt about the experience"],"lead":"You should say:","id":"S2-077"},{"title":"Describe a time when you missed or were late for an important meeting/event.","level":2,"say":["When it happened","What happened","Why you missed/were late for it","And explain how you felt about this experience"],"lead":"You should say:","id":"S2-078"},{"title":"Describe a piece of good advice that you gave to someone.","level":2,"say":["Who you gave the advice to","To whom you gave the advice","What the advice was","And explain why you gave the advice"],"lead":"You should say:","id":"S2-079"},{"title":"Describe a place where you thought things were too expensive.","level":2,"say":["Where the place is","What the place is like","Why you went there","What you bought there","And explain why you think things are expensive there"],"lead":"You should say:","id":"S2-080"},{"title":"Describe a difficult thing you did well.","level":2,"say":["What it was","How you overcame the difficulties","Whether you got help","And explain how you felt after you succeeded"],"lead":"You should say:","id":"S2-081"},{"title":"Describe a person who can play an instrument or has musical talents.","level":2,"say":["Who this person is","How and where you knew this person","Why you think he/she is talented","And explain how you found out that he/she is talented"],"lead":"You should say:","id":"S2-082"},{"title":"Describe a time you saw something interesting on social media.","level":2,"say":["When it was","Where you saw it","What you saw","And explain why you think it was interesting"],"lead":"You should say:","id":"S2-083"},{"title":"Describe an activity you usually do that wastes your time.","level":2,"say":["What it is","When you usually do it","Why you do it","And explain why you think it wastes your time"],"lead":"You should say:","id":"S2-084"},{"title":"Describe a time when you helped a child.","level":2,"say":["When it was","How you helped him/her","Why you helped him/her","And how you felt about it"],"lead":"You should say:","id":"S2-085"},{"title":"Describe a prize you have received recently (e.g. money, something valuable, a medal).","level":2,"say":["What it was","When you received it","What you did to receive it","And explain how you felt about it"],"lead":"You should say:","id":"S2-086"},{"title":"Describe a time when you were stuck in a traffic jam.","level":2,"say":["When it happened","Where you were stuck","What you did while waiting","And explain how you felt in the traffic jam"],"lead":"You should say:","id":"S2-087"},{"title":"Describe a person who often buys at the street market at a cheaper price.","level":2,"say":["Who this person is","What this person likes to buy","Where this person likes to buy things","And explain why this person likes cheap goods"],"lead":"You should say:","id":"S2-088"},{"title":"Describe a study course that impressed you a lot.","level":2,"say":["What the course was about","When you took the course","What you did during the course","And explain why it impressed you a lot"],"lead":"You should say:","id":"S2-089"},{"title":"Describe the first day you went to school that you remember.","level":2,"say":["When it happened","Where the school is","How you felt about the experience","And explain why you still remember the experience"],"lead":"You should say:","id":"S2-090"},{"title":"Describe an online video in which you learned something new.","level":2,"say":["When and where you watched it","What it was","Why you watched it","And explain what you have learned from it"],"lead":"You should say:","id":"S2-091"},{"title":"Describe something you would like to learn in the future.","level":2,"say":["What it is","How you would like to learn it","Where you would like to learn it","Why you would like to learn it","And explain whether it’s difficult to learn it"],"lead":"You should say:","id":"S2-092"},{"title":"Describe an important change in your life.","level":2,"say":["What the change was","When it happened","How you felt about it at the time","And explain why this change was important to you"],"lead":"You should say:","id":"S2-093"},{"title":"Describe a situation where someone congratulated you on something you’ve done well.","level":2,"say":["What the situation was","Who congratulated you","Why you were congratulated","And explain how you felt"],"lead":"You should say:","id":"S2-094"},{"title":"Describe a natural talent you want to improve like sport, music, etc.","level":2,"say":["What is it?","When did you discover it?","How do you want to improve it?","And how do you feel about it?"],"lead":"You should say:","id":"S2-095"},{"title":"Describe a complaint you made and were satisfied with the result.","level":2,"say":["When it happened","Who you complained to","What you complained about","And explain why you were satisfied with the result"],"lead":"You should say:","id":"S2-096"},{"title":"Describe a piece of equipment that is important in your home.","level":2,"say":["What it is","How often do you use it","With whom you use it","And explain why it is important"],"lead":"You should say:","id":"S2-097"},{"title":"Describe a skill that you learned from older people.","level":2,"say":["What the skill is","Who you learned it from","How you learned it","And how you feel about it","Many experiences"],"lead":"You should say:","id":"S2-098"},{"title":"Describe an activity you enjoyed in your free time when you were young.","level":2,"say":["What it was","Where you did it","Who you did it with","And explain why you enjoyed it"],"lead":"You should say:","id":"S2-099"},{"title":"Describe a person who you follow on social media.","level":2,"say":["Who he/she is","How you knew him/her","What he/she posts on social media","And explain why you follow him/her on social media"],"lead":"You should say:","id":"S2-100"},{"title":"Describe a time when you taught a friend or relative something useful (cooking,...).","level":2,"say":["Who you taught","What/how you taught","What the result was","And explain how you felt about the experience"],"lead":"You should say:","id":"S2-101"},{"title":"Describe something you do to keep fit and healthy.","level":2,"say":["What it is","When you do it","Who you do it with","Why it is important to keep fit and healthy","And explain why it can help you keep fit and healthy"],"lead":"You should say:","id":"S2-102"},{"title":"Describe a person who encouraged you and helped you achieve a goal.","level":2,"say":["Who this person is","What this person encouraged you to do","How this person has helped you","And explain why their encouragement helped you achieve the goal"],"lead":"You should say:","id":"S2-103"},{"title":"Describe something you own that you want to replace.","level":2,"say":["What it is","Where it is","How you got it","And explain why you want to replace it"],"lead":"You should say:","id":"S2-104"},{"title":"Describe a promise you made that was important to keep.","level":2,"say":["Who you made the promise to","What you promised","Whether it was easy or difficult to keep","And explain why keeping this promise mattered to you"],"lead":"You should say:","id":"S2-105"},{"title":"Describe a difficult task that you completed at work/study that you felt proud of.","level":2,"say":["What the task was","How you completed it","Why the task was difficult","Why you were proud of the completion of the task"],"lead":"You should say:","id":"S2-106"},{"title":"Describe something you received for free.","level":2,"say":["What it was","Who you received it from","Where you received it","And how you felt about it"],"lead":"You should say:","id":"S2-107"},{"title":"Describe a time when you shared something with others.","level":2,"say":["What you shared","Who you shared it with","Why you shared it","And explain how you felt about sharing it"],"lead":"You should say:","id":"S2-108"},{"title":"Describe a place with remarkable natural scenery (e.g. park, mountain).","level":2,"say":["Where this place is","How you knew this place","What it is like","And explain if you would like to visit it"],"lead":"You should say:","id":"S2-109"},{"title":"Describe a time when someone apologised to you.","level":2,"say":["Who apologised you and when","Why they apologised","And explain how you felt after they apologised"],"lead":"You should say:","id":"S2-110"},{"title":"Describe something that surprised you and made you happy.","level":2,"say":["What it was","Who did this","How you found out about it and what you did","And explain why it surprised you and made you happy"],"lead":"You should say:","id":"S2-111"},{"title":"Describe a skill that was difficult for you to learn.","level":2,"say":["When did you learn it?","Why did you learn it?","How did you learn it?","How did you feel when you learned it?"],"lead":"You should say:","id":"S2-112"},{"title":"Describe a time you were friendly to someone you didn’t like.","level":2,"say":["When and where it happened","Who he/she was","Why you didn’t like this person","And explain why you were friendly to him/her on this occasion"],"lead":"You should say:","id":"S2-113"},{"title":"Describe a successful small business that you know about.","level":2,"say":["What business/company it is","What this business does","How you know about this business","And explain why you think this business/company is successful"],"lead":"You should say:","id":"S2-114"},{"title":"Describe an occasion when someone gave you positive advice or suggestions about your work/study.","level":2,"say":["Who the person is","What he/she said","How the advice/suggestion affected you","And explain how you felt about the advice/suggestions"],"lead":"You should say:","id":"S2-115"},{"title":"Describe a person who overcame a difficult challenge.","level":2,"say":["Who this person is","What the challenge was","How they dealt with it","And explain what you learned from this person"],"lead":"You should say:","id":"S2-116"},{"title":"Describe a good service you received.","level":2,"say":["What the service was","When you received it","Who you were with","And how you felt about it"],"lead":"You should say:","id":"S2-117"},{"title":"Describe an important letter that you received.","level":2,"say":["Who wrote it to you","What the letter was about","How you felt about the letter","And explain why the letter was important to you"],"lead":"You should say:","id":"S2-118"},{"title":"Describe a person from whom others like to ask for advice.","level":2,"say":["Who this person is","Why people like to ask for his/her advice","What kind of advice he/she often gives","And explain how you feel about the person"],"lead":"You should say:","id":"S2-119"},{"title":"Describe a time you were very busy.","level":2,"say":["When it happened","Where you were","What you did","And explain why you were busy"],"lead":"You should say:","id":"S2-120"},{"title":"Describe a person who has strong opinions.","level":3,"say":["Who this person is","How you knew him/her","What kinds of strong opinions this person has","And explain why you think he/she is a person who has strong opinions"],"lead":"You should say:","id":"S2-121"},{"title":"Describe a time when you took a risk and you knew something bad might happen, but it had a positive result.","level":3,"say":["What risk you took","What bad thing you thought might happen","Why you decided to take this risk","And explain why the result of taking this risk was positive"],"lead":"You should say:","id":"S2-122"},{"title":"Describe a historical period/moment you would like to learn more about.","level":3,"say":["When it was","What you are interested in","What you have known","And explain why you would like to know more"],"lead":"You should say:","id":"S2-123"},{"title":"Describe a person you know who has chosen a career in the medical field (e.g. a doctor, a nurse).","level":3,"say":["Who he/she is","What he/she does","Why he/she chose this career","And explain how you feel about him/her"],"lead":"You should say:","id":"S2-124"},{"title":"Describe a challenge you faced that you thought was rather difficult.","level":3,"say":["What it was","When and where you faced it","Why you thought it was a difficult challenge","And explain how you felt at the time"],"lead":"You should say:","id":"S2-125"},{"title":"Describe an ideal and perfect place where you would like to stay (e.g. a house, an apartment).","level":3,"say":["Where it would be","What it would look like","What special features it would have","Whether it would be big or small","And explain why it would be an ideal place for you"],"lead":"You should say:","id":"S2-126"},{"title":"Describe a person you know who you think is very intelligent.","level":3,"say":["Who this person is","How you know this person","Why you think this person is very intelligent","And explain how you feel about this person"],"lead":"You should say:","id":"S2-127"},{"title":"Describe a news story that affected you emotionally.","level":3,"say":["What the story was about","When and where you saw it","How people around you reacted","And explain why it affected you so much"],"lead":"You should say:","id":"S2-128"},{"title":"Describe a historical building you have been to.","level":3,"say":["Where it is","What it looks like","What it is used for now","What you learned there","And explain how you felt about this historical building"],"lead":"You should say:","id":"S2-129"},{"title":"Describe a famous person who you think will be a role model for young people.","level":3,"say":["Who he/she is","How you knew him/her","What he/she has done","And explain why he/she can be a role model for young people"],"lead":"You should say:","id":"S2-130"},{"title":"Describe a place you have visited that is affected by severe air pollution.","level":3,"say":["Where have you been to a place with serious air pollution?","Why is it serious?","What kind of pollution there was","And explain how you felt about the pollution in this place"],"lead":"You should say:","id":"S2-131"},{"title":"Describe an important river, lake or area of water in your country.","level":3,"say":["Where in your country it is","How big it is","What it looks like","And explain why this river, lake or area of water is important for your country"],"lead":"You should say:","id":"S2-132"},{"title":"Describe a product that you would like to buy in other countries.","level":3,"say":["What product it is","When you want to buy it","Whether it has any special feature","And explain why you want to buy it"],"lead":"You should say:","id":"S2-133"},{"title":"Describe a difficult decision you made.","level":3,"say":["What the decision was","When you made it","What options you had","And explain how you feel about the decision now"],"lead":"You should say:","id":"S2-134"},{"title":"Describe an important plant that grows in your country.","level":3,"say":["What it is","Where you see it","What it looks like","And explain why it is important"],"lead":"You should say:","id":"S2-135"},{"title":"Describe an advertisement you have seen but you did not like.","level":3,"say":["Where and when you saw it","What the advertisement was for","What you could see in the advertisement","And explain why you did not like the advertisement"],"lead":"You should say:","id":"S2-136"},{"title":"Describe a rule that you don’t like.","level":3,"say":["What it is","Why you don’t like it","How others feel about the rule","And explain whether you’ve followed the rule"],"lead":"You should say:","id":"S2-137"},{"title":"Describe a cultural place that you would like to learn the culture there (e.g. a library, museum, theatre).","level":3,"say":["Where it is","How you knew this place","What it is like","And explain how the place is related to culture"],"lead":"You should say:","id":"S2-138"},{"title":"Describe someone you know who made a good decision recently.","level":3,"say":["Who he/she is","When he/she made the decision","What decision he/she made","Why it was a good decision","And explain how you felt about the decision"],"lead":"You should say:","id":"S2-139"},{"title":"Describe a new law that you want to implement in your country.","level":3,"say":["What law it is","What changes this law brings","Whether this new law will be popular","How you came up with the new law","And explain how you feel about this new law"],"lead":"You should say:","id":"S2-140"},{"title":"Describe a new development in the area where you live (e.g shopping mall, park, etc.).","level":3,"say":["What the development is","When/where you noticed it","How long it took to complete it","And explain how you feel about it"],"lead":"You should say:","id":"S2-141"},{"title":"Describe a public facility that has been upgraded.","level":3,"say":["What the facility is","When it was renovated and improved","What has been renovated and improved","And explain how you feel about it"],"lead":"You should say:","id":"S2-142"},{"title":"Describe your favourite type of climate.","level":3,"say":["What is it?","Is it hot or cold?","How often is the rain?","And explain why you like this type of climate"],"lead":"You should say:","id":"S2-143"},{"title":"Describe a place you know where people can see a lot of wildlife (e.g. animals, birds, insects).","level":3,"say":["Where it is","What kinds of wildlife people can see there","Whether people like to go there","And explain how you feel about it"],"lead":"You should say:","id":"S2-144"},{"title":"Describe a person who contributes a great deal to society.","level":3,"say":["Who this person is","How you knew him/her","What type of work he/she does","And explain why thin he/she contributes to the society"],"lead":"You should say:","id":"S2-145"},{"title":"Describe an important achievement you have made.","level":3,"say":["What you achieved","When and where you did it","Why it was an important achievement","And explain how you earned it"],"lead":"You should say:","id":"S2-146"},{"title":"Describe a city you would recommend as a nice place to live (not your hometown).","level":3,"say":["Where it is","What the place is like","When you visited there","Who you went there with","And explain why you would recommend this place to others"],"lead":"You should say:","id":"S2-147"},{"title":"Describe a traditional product in your country.","level":3,"say":["What it is","When you tried this product for the first time","What it is made of","And explain how you feel about it"],"lead":"You should say:","id":"S2-148"},{"title":"Describe a job that is useful to society.","level":3,"say":["What job it is","How you know about this job","What types of people do this job","And explain why you think this job is useful to the society"],"lead":"You should say:","id":"S2-149"},{"title":"Describe an invention that has changed the world in a positive way.","level":3,"say":["What it is","What benefits it has brought","How it influences people of different ages","And explain how it changed people’s lives"],"lead":"You should say:","id":"S2-150"},{"title":"Describe a good decision you just made recently.","level":3,"say":["What the decision was","When and where you made this decision","What happened as a result of this decision","And explain why you think this was a good decision to make"],"lead":"You should say:","id":"S2-151"},{"title":"Describe an ambition that you haven’t achieved.","level":3,"say":["What it is","Why you haven’t achieved it","What you are doing about it now","And how you feel about it"],"lead":"You should say:","id":"S2-152"},{"title":"Describe a technology you think will change the world in the future.","level":3,"say":["What it is","How you know about it","What it can do","And explain why you think it will have such a big impact"],"lead":"You should say:","id":"S2-153"},{"title":"Describe a contest/competition you would like to participate in.","level":3,"say":["What the contest/competition is about","Where the contest/competition will take place","When it will be held","And explain why you would like to participate in it"],"lead":"You should say:","id":"S2-154"}]};
+const TOP = {}, CARD = {};
+SDATA.topics.forEach(t => TOP[t.id] = t); SDATA.cards.forEach(c => CARD[c.id] = c);
+const P1_SECONDS = 600, PREP_SECONDS = 60, TALK_SECONDS = 120;
+const RATE = 16000, KBPS = 40, GAP = 0.5;
+const HAS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
+const ENDPOINT = String((window.IRT_CONFIG && window.IRT_CONFIG.endpoint) || '').trim();
+const HAS_REMOTE = /^https:\/\/script\.google\.com\/(a\/[^/]+\/)?macros\/s\/[^/]+\/exec$/.test(ENDPOINT);
+const ONLINE = !!(HAS_GAS || HAS_REMOTE);
+
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+function gas(fn, ...args){
+  if(HAS_GAS) return new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args));
+  if(!HAS_REMOTE) return Promise.reject(new Error('offline'));
+  const big = fn === 'submitAttempt';
+  const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = ctl ? setTimeout(() => ctl.abort(), big ? 240000 : 30000) : null;
+  const body = JSON.stringify({fn, args});
+  return fetch(ENDPOINT, {method: 'POST', redirect: 'follow', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body, signal: ctl ? ctl.signal : undefined})
+    .then(r => { if(!r.ok) throw Object.assign(new Error('The Apps Script URL answered with error ' + r.status + '. Check the URL in config.js.'), {server: true}); return r.text(); })
+    .then(t => {
+      let j; try{ j = JSON.parse(t); }catch(e){ throw Object.assign(new Error(/<html|<!DOCTYPE/i.test(t) ? 'Apps Script sent back a web page instead of data. The deployment is probably not set to "Anyone", or it is an old version.' : 'Unexpected answer from Apps Script.'), {server: true}); }
+      if(!j || !j.ok) throw Object.assign(new Error((j && j.error) || 'Server error'), {server: true});
+      return j.result;
+    })
+    .catch(err => {
+      if(err.name === 'AbortError') throw new Error('Apps Script did not answer in time. The connection may be slow.');
+      if(!err.server && big) return fetch(ENDPOINT, {method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body}).then(() => ({unconfirmed: true}));
+      if(!err.server) throw new Error('Could not reach Apps Script (' + (err.message || 'network error') + ').');
+      throw err;
+    })
+    .finally(() => timer && clearTimeout(timer));
+}
+const $ = s => document.querySelector(s);
+const slug = n => n.trim().toLowerCase().replace(/\s+/g, ' ');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+const shuffle = a => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- theme ---------- */
+function applyTheme(){
+  const pref = LS.get('ielts_theme', LS.get('irt_theme', null));
+  const dark = pref ? pref === 'dark' : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  document.querySelectorAll('[data-theme-toggle]').forEach(b => b.textContent = dark ? 'Light' : 'Dark');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-theme-toggle]'); if(!b) return;
+  LS.set('ielts_theme', document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); applyTheme();
+});
+applyTheme();
+
+/* ---------- small database for recordings (too big for localStorage) ---------- */
+const DB = {
+  db: null,
+  open(){
+    if(this.db) return Promise.resolve(this.db);
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('ielts-speaking', 1);
+      r.onupgradeneeded = () => { const d = r.result; if(!d.objectStoreNames.contains('segs')) d.createObjectStore('segs', {keyPath: 'k'}); if(!d.objectStoreNames.contains('outbox')) d.createObjectStore('outbox', {keyPath: 'attemptId'}); };
+      r.onsuccess = () => { this.db = r.result; res(this.db); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  tx(store, mode, fn){ return this.open().then(d => new Promise((res, rej) => { const t = d.transaction(store, mode), s = t.objectStore(store); let out; const q = fn(s); if(q) q.onsuccess = () => { out = q.result; }; t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error); })); },
+  put(store, v){ return this.tx(store, 'readwrite', s => s.put(v)); },
+  get(store, k){ return this.tx(store, 'readonly', s => s.get(k)); },
+  del(store, k){ return this.tx(store, 'readwrite', s => s.delete(k)); },
+  all(store){ return this.tx(store, 'readonly', s => s.getAll()); }
+};
+const segKey = (aid, i) => aid + ':' + String(i).padStart(2, '0');
+async function dropSegs(aid){ try{ const all = await DB.all('segs'); await Promise.all(all.filter(x => x.k.startsWith(aid + ':')).map(x => DB.del('segs', x.k))); }catch(e){} }
+
+/* ---------- microphone recorder: 16 kHz mono, encoded to MP3 while recording ---------- */
+const Rec = {
+  ctx: null, stream: null, node: null, on: false, level: 0, enc: null, parts: [], pend: null, pendN: 0, sum: 0, cnt: 0, pos: 0, ratio: 3, samples: 0,
+  async init(){
+    if(this.stream && this.stream.active && this.ctx && this.ctx.state !== 'closed'){ if(this.ctx.state === 'suspended') await this.ctx.resume(); return; }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw Object.assign(new Error('This browser cannot record audio.'), {code: 'nosupport'});
+    this.stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1}});
+    const AC = window.AudioContext || window.webkitAudioContext;
+    this.ctx = new AC();
+    if(this.ctx.state === 'suspended') await this.ctx.resume();
+    this.ratio = this.ctx.sampleRate / RATE;
+    const src = this.ctx.createMediaStreamSource(this.stream);
+    const mute = this.ctx.createGain(); mute.gain.value = 0; mute.connect(this.ctx.destination);
+    const onData = d => this.feed(d);
+    if(this.ctx.audioWorklet && window.AudioWorkletNode){
+      const code = `class Cap extends AudioWorkletProcessor{constructor(){super();this.b=new Float32Array(2048);this.n=0}process(i){const c=i[0]&&i[0][0];if(c){for(let k=0;k<c.length;k++){this.b[this.n++]=c[k];if(this.n===2048){this.port.postMessage(this.b.slice(0));this.n=0}}}return true}}registerProcessor('cap',Cap);`;
+      const url = URL.createObjectURL(new Blob([code], {type: 'application/javascript'}));
+      await this.ctx.audioWorklet.addModule(url);
+      this.node = new AudioWorkletNode(this.ctx, 'cap', {numberOfInputs: 1, numberOfOutputs: 1, channelCount: 1});
+      this.node.port.onmessage = e => onData(e.data);
+    } else {
+      this.node = this.ctx.createScriptProcessor(4096, 1, 1);
+      this.node.onaudioprocess = e => onData(e.inputBuffer.getChannelData(0));
+    }
+    src.connect(this.node); this.node.connect(mute);
+  },
+  feed(d){
+    let peak = 0;
+    for(let i = 0; i < d.length; i++){ const a = Math.abs(d[i]); if(a > peak) peak = a; }
+    this.level = Math.max(peak, this.level * 0.85);
+    if(!this.on) return;
+    for(let i = 0; i < d.length; i++){
+      this.sum += d[i]; this.cnt++; this.pos += 1;
+      if(this.pos >= this.ratio){
+        this.pos -= this.ratio;
+        const v = Math.max(-1, Math.min(1, (this.sum / this.cnt)));
+        this.pend[this.pendN++] = v < 0 ? v * 0x8000 : v * 0x7FFF;
+        this.sum = 0; this.cnt = 0;
+        if(this.pendN === 1152){ this.push(this.enc.encodeBuffer(this.pend)); this.pendN = 0; this.samples += 1152; }
+      }
+    }
+  },
+  push(b){ if(b && b.length) this.parts.push(new Uint8Array(b)); },
+  start(){ this.enc = new lamejs.Mp3Encoder(1, RATE, KBPS); this.parts = []; this.pend = new Int16Array(1152); this.pendN = 0; this.sum = 0; this.cnt = 0; this.pos = 0; this.samples = 0; this.on = true; },
+  stop(){
+    if(!this.on) return null;
+    this.on = false;
+    if(this.pendN){ this.push(this.enc.encodeBuffer(this.pend.subarray(0, this.pendN))); this.samples += this.pendN; }
+    this.push(this.enc.flush());
+    const n = this.parts.reduce((s, p) => s + p.length, 0), out = new Uint8Array(n); let o = 0;
+    this.parts.forEach(p => { out.set(p, o); o += p.length; }); this.parts = [];
+    return {bytes: out, seconds: n * 8 / (KBPS * 1000)};
+  },
+  release(){ this.on = false; try{ this.stream && this.stream.getTracks().forEach(t => t.stop()); }catch(e){} try{ this.ctx && this.ctx.close(); }catch(e){} this.stream = null; this.ctx = null; this.node = null; this.level = 0; }
+};
+let silenceMp3 = null;
+function silence(){
+  if(silenceMp3) return silenceMp3;
+  const e = new lamejs.Mp3Encoder(1, RATE, KBPS), z = new Int16Array(1152), out = [];
+  for(let i = 0; i < Math.round(GAP * RATE / 1152); i++){ const b = e.encodeBuffer(z); if(b.length) out.push(new Uint8Array(b)); }
+  const f = e.flush(); if(f.length) out.push(new Uint8Array(f));
+  const n = out.reduce((s, p) => s + p.length, 0); silenceMp3 = new Uint8Array(n); let o = 0; out.forEach(p => { silenceMp3.set(p, o); o += p.length; });
+  return silenceMp3;
+}
+
+/* ---------- state ---------- */
+let profile = LS.get('ielts_profile', LS.get('irt_profile', LS.get('irl_profile', null)));
+let hist = null, cur = null, loop = null, lastT = 0, wake = null, meterRaf = null;
+const K = {
+  hist: () => 'irs_hist_' + slug(profile.name),
+  cur: () => 'irs_cur_' + slug(profile.name),
+  next: () => 'irs_next_' + slug(profile.name),
+  shuf: () => 'irs_shuf_' + slug(profile.name),
+  newOnly: () => 'irs_newonly_' + slug(profile.name),
+  clr: () => 'irs_clear_' + slug(profile.name)
+};
+const loadHist = () => { hist = LS.get(K.hist(), {done: [], attempts: []}); };
+const saveHist = () => LS.set(K.hist(), hist);
+const saveCur = () => { if(cur) LS.set(K.cur(), cur); };
+
+/* ---------- ui helpers ---------- */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('enter'); });
+  const el = document.getElementById(id); el.classList.remove('hidden'); void el.offsetWidth; el.classList.add('enter');
+  window.scrollTo(0, 0);
+}
+function toast(msg, kind, ms){
+  const t = document.createElement('div'); t.className = 'toast ' + (kind || ''); t.textContent = msg;
+  $('#toasts').appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, ms || 3600);
+}
+function dialog(title, body, buttons){
+  return new Promise(res => {
+    const o = document.createElement('div'); o.className = 'overlay';
+    o.innerHTML = `<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgT"><h3 id="dlgT">${esc(title)}</h3><p>${body}</p><div class="row"></div></div>`;
+    const row = o.querySelector('.row');
+    buttons.forEach(b => { const el = document.createElement('button'); el.className = 'btn ' + (b.cls || 'btn-line'); el.textContent = b.label; el.onclick = () => { o.remove(); res(b.value); }; row.appendChild(el); });
+    o.addEventListener('click', e => { if(e.target === o){ o.remove(); res(null); } });
+    o.addEventListener('keydown', e => { if(e.key === 'Escape'){ o.remove(); res(null); } });
+    document.body.appendChild(o);
+    setTimeout(() => { const p = row.querySelector('.btn-primary') || row.lastChild; p && p.focus(); }, 30);
+  });
+}
+async function keepAwake(on){
+  try{
+    if(on && 'wakeLock' in navigator && !wake){ wake = await navigator.wakeLock.request('screen'); wake.addEventListener('release', () => { wake = null; }); }
+    if(!on && wake){ await wake.release(); wake = null; }
+  }catch(e){}
+}
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && cur && cur.status === 'active') keepAwake(true); });
+
+/* ---------- choosing topics ---------- */
+const isDone = id => hist.done.includes(id);
+const freshTopics = () => SDATA.topics.filter(t => !isDone(t.id));
+const freshCards = () => SDATA.cards.filter(c => !isDone(c.id));
+const fullParts = () => [freshTopics().length < 3 ? 'Part 1 topic' : null, freshCards().length < 1 ? 'Part 2 cue card' : null].filter(Boolean);
+const canNewOnly = () => !fullParts().length;
+const newOnly = () => LS.get(K.newOnly(), true) !== false && canNewOnly();
+function pickSet(avoid){
+  const only = newOnly();
+  let tp = (only ? freshTopics() : SDATA.topics).map(t => t.id), cp = (only ? freshCards() : SDATA.cards).map(c => c.id);
+  if(avoid){ const t2 = tp.filter(id => !avoid.topics.includes(id)); if(t2.length >= 3) tp = t2; const c2 = cp.filter(id => id !== avoid.card); if(c2.length) cp = c2; }
+  const topics = shuffle(tp).slice(0, 3).sort((a, b) => TOP[a].level - TOP[b].level);
+  return {topics, card: cp[Math.floor(Math.random() * cp.length)]};
+}
+function nextSet(){
+  const s = LS.get(K.next(), null), only = newOnly();
+  if(s && s.topics && s.topics.length === 3 && s.topics.every(id => TOP[id] && (!only || !isDone(id))) && CARD[s.card] && (!only || !isDone(s.card))) return s;
+  const t = pickSet(); LS.set(K.next(), t); LS.set(K.shuf(), 0); return t;
+}
+
+/* ---------- home ---------- */
+function enterHome(){
+  stopLoop(); Rec.release(); keepAwake(false);
+  loadHist(); renderHome(); show('screen-home');
+  flushClears().then(() => gas('getHistory', profile.name, 'speaking')).then(h => {
+    if(!h) return;
+    const before = hist.done.length + hist.attempts.length;
+    (h.done || []).forEach(id => { if(!hist.done.includes(id)) hist.done.push(id); });
+    const have = new Set(hist.attempts.map(a => a.id));
+    (h.attempts || []).forEach(a => { if(!have.has(a.id)) hist.attempts.push(a); });
+    hist.attempts.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    saveHist();
+    if(hist.done.length + hist.attempts.length !== before && !$('#screen-home').classList.contains('hidden')) renderHome();
+  }).catch(() => {});
+  flushOutbox();
+}
+function setHtml(s){
+  return s.topics.map((id, i) => `<li><span class="pn num">${i + 1}</span><div><h3>${esc(TOP[id].title)}</h3><div class="wtype">Part 1 topic, 2 or 3 questions</div></div></li>`).join('') +
+    `<li><span class="pn num">4</span><div><h3>Part 2 cue card</h3><div class="wtype">Hidden until your preparation minute starts. Up to 1 minute to prepare (start early if you are ready), then up to 2 minutes to talk.</div></div></li>`;
+}
+function renderHome(){
+  const first = profile.name.split(' ').slice(-1)[0];
+  $('#homeWho').textContent = profile.name;
+  const n = hist.attempts.length;
+  $('#homeHello').textContent = n ? `Welcome back, ${first}` : `Hello, ${first}`;
+  $('#homeLede').textContent = n
+    ? `You have finished ${plural(n, 'speaking test')}. ${freshTopics().length} of ${SDATA.topics.length} Part 1 topics and ${freshCards().length} of ${SDATA.cards.length} cue cards are still new to you.`
+    : 'Speaking Parts 1 and 2. Answer each question out loud: recording starts by itself, and your teacher gets the recording by email.';
+  let c = LS.get(K.cur(), null);
+  if(c && !(c.topics || []).every(id => TOP[id])){ LS.del(K.cur()); c = null; }
+  if(c && c.status === 'active'){
+    cur = c;
+    const where = c.phase === 'check' ? 'the microphone check' : c.phase === 'p1' ? `Part 1, question ${c.qIdx + 1} of ${c.qs.length}` : 'Part 2';
+    $('#resumeBox').innerHTML = `<div class="resume"><div><b>You have a test in progress</b><span>You stopped at ${where}. ${c.phase === 'check' ? '' : c.phase === 'p1' ? 'You will answer that question again.' : 'Part 2 starts again from the preparation minute.'} Answers you finished are kept.</span></div><button class="btn btn-primary" id="resumeBtn">Resume test</button></div>`;
+    $('#resumeBtn').onclick = resumeTest;
+    $('#nextBox').classList.add('hidden');
+  } else {
+    cur = null; $('#resumeBox').innerHTML = ''; $('#nextBox').classList.remove('hidden');
+    $('#trio').innerHTML = setHtml(nextSet());
+  }
+  const dt = a => esc(new Date(a.date).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}));
+  $('#histBox').innerHTML = !n ? '<div class="empty">No attempts yet. Your tests will appear here after you finish them.</div>' :
+    `<table class="htable"><thead><tr><th>Date</th><th>Part 1</th><th>Part 2</th><th class="pas">Topics</th><th class="rm"><span class="sr">Remove</span></th></tr></thead><tbody>${hist.attempts.slice().reverse().map(a => `<tr><td>${dt(a)}</td><td class="num">${a.s ? fmt(a.s[0]) : ''}</td><td class="num">${a.s ? fmt(a.s[1]) : ''}</td><td class="pas">${(a.ex || []).filter(id => TOP[id]).map(id => esc(TOP[id].title)).join(', ')}</td><td class="rm"><button class="rmbtn" data-id="${esc(a.id)}" aria-label="Remove the attempt from ${dt(a)}">Remove</button></td></tr>`).join('')}</tbody></table>`;
+  $('#clearAll').hidden = !n;
+  $('#histBox').querySelectorAll('.rmbtn').forEach(b => b.onclick = () => removeAttempt(b.dataset.id));
+  renderNewOnly();
+}
+function renderNewOnly(){
+  const can = canNewOnly(), box = $('#newOnly'), note = $('#newOnlyNote');
+  box.disabled = !can; box.checked = newOnly(); note.hidden = can;
+  if(!can) note.textContent = `You have done almost every ${fullParts().join(' and ')}, so ones you have done before will come up again. Clear your past attempts below to get only new ones.`;
+}
+$('#newOnly').addEventListener('change', () => {
+  LS.set(K.newOnly(), $('#newOnly').checked);
+  const s = LS.get(K.next(), null);
+  if($('#newOnly').checked && s && (s.topics.some(isDone) || isDone(s.card))){
+    const t = pickSet(); LS.set(K.next(), t);
+    const ol = $('#trio'); ol.classList.remove('swap'); ol.innerHTML = setHtml(t); void ol.offsetWidth; ol.classList.add('swap');
+  }
+});
+$('#shuffleBtn').addEventListener('click', () => {
+  const old = LS.get(K.next(), null) || nextSet();
+  const t = pickSet(old); LS.set(K.next(), t); LS.set(K.shuf(), (LS.get(K.shuf(), 0) || 0) + 1);
+  const ol = $('#trio'); ol.classList.remove('swap'); ol.innerHTML = setHtml(t); void ol.offsetWidth; ol.classList.add('swap');
+});
+
+/* ---------- clearing past attempts ---------- */
+function flushClears(){
+  if(!ONLINE){ LS.del(K.clr()); return Promise.resolve(); }
+  return LS.get(K.clr(), []).reduce((p, which) => p.then(() => gas('clearHistory', profile.name, 'speaking', which).then(() => {
+    LS.set(K.clr(), LS.get(K.clr(), []).filter(x => x !== which));
+  })), Promise.resolve());
+}
+function queueClear(which){
+  if(!ONLINE) return;
+  LS.set(K.clr(), which === 'all' ? ['all'] : LS.get(K.clr(), []).concat(which));
+  flushClears().catch(() => {});
+}
+async function removeAttempt(id){
+  const a = hist.attempts.find(x => x.id === id); if(!a) return;
+  const ok = await dialog('Remove this attempt?', `The test from <b>${esc(new Date(a.date).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}))}</b> will be taken off your history, and its topics and cue card count as new again. Your teacher still has your recording.`,
+    [{label:'Cancel'}, {label:'Remove', cls:'btn-primary', value:true}]);
+  if(!ok) return;
+  hist.attempts = hist.attempts.filter(x => x.id !== id);
+  const still = new Set(hist.attempts.flatMap(x => x.ex || []));
+  hist.done = hist.done.filter(d => still.has(d) || !(a.ex || []).includes(d));
+  saveHist(); queueClear(id); renderHome(); toast('Attempt removed.');
+}
+$('#clearAll').addEventListener('click', async () => {
+  const ok = await dialog('Clear all past attempts?', `All <b>${plural(hist.attempts.length, 'Speaking attempt')}</b> will be taken off your history and every topic and cue card counts as new again. Your teacher still has your recordings. This cannot be undone.`,
+    [{label:'Cancel'}, {label:'Clear all', cls:'btn-primary', value:true}]);
+  if(!ok) return;
+  hist = {done: [], attempts: []}; saveHist(); queueClear('all'); renderHome(); toast('Past attempts cleared.');
+});
+
+/* ---------- starting ---------- */
+async function micReady(){
+  try{ await Rec.init(); return true; }
+  catch(e){
+    Rec.release();
+    const name = e && (e.name || e.code);
+    const msg = name === 'NotAllowedError' || name === 'SecurityError' ? 'The browser was not allowed to use your microphone. Click the microphone or lock icon next to the address bar, choose Allow, then press Start test again.'
+      : name === 'NotFoundError' ? 'No microphone was found. Plug in a headset or use a phone or laptop with a microphone.'
+      : name === 'nosupport' ? 'This browser cannot record audio. Please use an up-to-date Chrome, Edge, Firefox or Safari.'
+      : 'The microphone could not be started (' + esc(e && e.message || 'unknown error') + ').';
+    await dialog('Microphone needed', msg, [{label:'OK', cls:'btn-primary'}]);
+    return false;
+  }
+}
+$('#startBtn').addEventListener('click', async () => {
+  if(typeof lamejs === 'undefined'){ toast('The recording tool did not load. Check your connection and reload the page.', 'warn', 6000); return; }
+  if(!(await micReady())) return;
+  const s = nextSet();
+  const qs = [];
+  // the first question of a topic sets the scene; one or two more follow in the original order
+  s.topics.forEach(id => { const t = TOP[id], k = Math.min(t.qs.length, 2 + Math.round(Math.random())); [0].concat(shuffle(t.qs.map((q, i) => i).slice(1)).slice(0, k - 1)).sort((a, b) => a - b).forEach(i => qs.push({topic: id, q: t.qs[i]})); });
+  cur = {attemptId: uid(), topics: s.topics, card: s.card, qs, phase: 'check', qIdx: 0, p1: 0, prep: 0, talk: 0, notes: '', segs: [], startedAt: new Date().toISOString(), status: 'active', sessions: 1, shuffles: LS.get(K.shuf(), 0) || 0, endedEarly: false};
+  saveCur(); LS.del(K.next()); LS.del(K.shuf());
+  show('screen-test'); keepAwake(true); micCheck();
+});
+async function resumeTest(){
+  if(!(await micReady())) return;
+  cur.sessions = (cur.sessions || 1) + 1;
+  if(cur.phase === 'prep' || cur.phase === 'talk' || cur.phase === 'done'){ cur.phase = 'prep'; cur.prep = 0; cur.talk = 0; cur.segs = cur.segs.filter(g => g.part === 1); }
+  saveCur(); show('screen-test'); keepAwake(true);
+  if(cur.phase === 'check') micCheck(); else if(cur.phase === 'p1') askQuestion(); else startPrep();
+  toast('Welcome back. Your finished answers are kept.');
+}
+
+/* ---------- the clock: one loop drives every timer ---------- */
+function startLoop(fn){ stopLoop(); lastT = performance.now(); loop = setInterval(() => { const now = performance.now(), dt = (now - lastT) / 1000; lastT = now; fn(dt); }, 200); }
+function stopLoop(){ if(loop){ clearInterval(loop); loop = null; } }
+function setTimer(label, secs, cls){ $('#timerLbl').textContent = label; $('#timerTxt').textContent = secs == null ? '' : fmt(secs); const t = $('#timer'); t.classList.toggle('warn', cls === 'warn'); t.classList.toggle('danger', cls === 'danger'); }
+function setStep(s){ document.querySelectorAll('#steps span').forEach(x => x.classList.toggle('on', x.dataset.s === s)); }
+function meter(){ cancelAnimationFrame(meterRaf); const step = () => { const m = document.querySelector('.meter i'); if(m) m.style.width = Math.min(100, Math.round(Math.sqrt(Rec.level) * 120)) + '%'; Rec.level *= 0.94; meterRaf = requestAnimationFrame(step); }; meterRaf = requestAnimationFrame(step); }
+const recbar = (label, on) => `<div class="recbar ${on ? 'on' : ''}" id="recbar"><span class="lab" id="recLab">${label}</span><div class="meter" aria-hidden="true"><i></i></div><span class="t num" id="recT">${on ? '0:00' : ''}</span></div>`;
+
+function micCheck(){
+  setStep('check'); setTimer('', null);
+  cur.phase = 'check'; saveCur();
+  $('#stageIn').innerHTML = `<div class="miccheck"><p class="kicker"><span>Before you start</span></p><h1 class="bigq">Check your microphone</h1>
+    <p>Say a few words, for example your full name. The bar below should move when you speak. If it does not move, check that the right microphone is selected and not muted.</p>
+    ${recbar('MIC', false)}
+    <p style="color:var(--ink-2)">Part 1 starts when you press the button: each question appears and recording starts by itself. Press <b>Next question</b> when you finish an answer. Part 1 has 10 minutes in total.</p>
+    <div class="stagebtns"><button class="btn btn-primary" id="goP1">Start Part 1</button></div></div>`;
+  meter();
+  $('#goP1').onclick = () => { cur.phase = 'p1'; cur.qIdx = 0; cur.p1 = 0; saveCur(); askQuestion(); };
+}
+function askQuestion(){
+  setStep('p1');
+  const q = cur.qs[cur.qIdx], ti = cur.topics.indexOf(q.topic), last = cur.qIdx === cur.qs.length - 1;
+  $('#stageIn').innerHTML = `<p class="kicker"><span><b>Part 1</b></span><span>Topic ${ti + 1} of 3: ${esc(TOP[q.topic].title)}</span><span>Question ${cur.qIdx + 1} of ${cur.qs.length}</span></p>
+    <h1 class="bigq">${esc(q.q)}</h1>
+    ${recbar('REC', true)}
+    <div class="stagebtns"><button class="btn btn-primary" id="nextQ">${last ? 'Finish Part 1' : 'Next question'}</button><span class="hint">Recording started. Answer out loud, then press the button.</span></div>`;
+  meter();
+  Rec.start(); const t0 = cur.p1; let ans = 0;
+  $('#nextQ').onclick = () => endAnswer(false);
+  startLoop(dt => {
+    cur.p1 += dt; ans += dt;
+    const left = P1_SECONDS - cur.p1;
+    setTimer('Part 1 left', left, left <= 60 ? 'danger' : left <= 120 ? 'warn' : '');
+    const rt = $('#recT'); if(rt) rt.textContent = fmt(ans);
+    if(Math.floor(cur.p1) % 5 === 0) saveCur();
+    if(left <= 0) endAnswer(true);
+  });
+  void t0;
+}
+let ending = false;
+async function endAnswer(timeUp){
+  if(!cur || cur.phase !== 'p1' || ending) return;
+  ending = true;
+  stopLoop();
+  const r = Rec.stop();
+  const i = cur.qIdx;
+  if(r){ await DB.put('segs', {k: segKey(cur.attemptId, i), bytes: r.bytes}).catch(() => {}); cur.segs = cur.segs.filter(g => !(g.part === 1 && g.i === i)); cur.segs.push({part: 1, i, dur: r.seconds}); }
+  if(timeUp || i >= cur.qs.length - 1){
+    if(timeUp) toast(i < cur.qs.length - 1 ? 'Part 1 time is over. Moving on to Part 2.' : 'Part 1 time is over.', 'warn', 5000);
+    cur.phase = 'prep'; cur.prep = 0; saveCur(); startPrep();
+  } else { cur.qIdx = i + 1; saveCur(); askQuestion(); }
+  ending = false;
+}
+function cueHtml(c){ return `<div class="cue"><h3>${esc(c.title)}</h3><p>You should say:</p><ul>${c.say.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`; }
+function startPrep(){
+  setStep('p2');
+  const c = CARD[cur.card];
+  $('#stageIn').innerHTML = `<p class="kicker"><span><b>Part 2</b></span><span>Preparation</span></p>
+    <div class="prepclock"><div><span class="pc-lab">Time left to prepare</span><div class="n num" id="prepN">1:00</div></div><p>Plan your talk. Recording starts by itself when the minute is up, and you will have up to 2 minutes to speak. Ready sooner? You can start talking now.</p><i class="pc-bar" aria-hidden="true"><b id="prepBar"></b></i></div>
+    ${cueHtml(c)}
+    <label class="notelab" for="notes">Your notes (optional)</label><textarea class="notes" id="notes" placeholder="Key words and ideas">${esc(cur.notes || '')}</textarea>
+    <div class="stagebtns" style="margin-top:20px"><button class="btn btn-primary" id="skipPrep">I'm ready, start my talk</button><span class="hint">You don't have to use the whole minute.</span></div>`;
+  $('#skipPrep').onclick = async () => {
+    if(!cur || cur.phase !== 'prep') return;
+    if(!(await dialog('Start your talk now?', `You still have <b>${fmt(Math.max(0, Math.ceil(PREP_SECONDS - cur.prep)))}</b> of preparation time. Recording starts as soon as you continue.`, [{label:'Keep preparing'}, {label:'Start talking', cls:'btn-primary', value:true}]))) return;
+    if(!cur || cur.phase !== 'prep') return;
+    stopLoop(); const n = $('#notes'); if(n) cur.notes = n.value; cur.prepSkipped = true; cur.phase = 'talk'; cur.talk = 0; saveCur(); startTalk();
+  };
+  $('#notes').addEventListener('input', () => { cur.notes = $('#notes').value; });
+  setTimeout(() => { const n = $('#notes'); if(n) n.focus({preventScroll: true}); }, 200);
+  startLoop(dt => {
+    cur.prep += dt; const left = PREP_SECONDS - cur.prep;
+    setTimer('Prepare', left, left <= 10 ? 'danger' : '');
+    const n = $('#prepN'); if(n) n.textContent = fmt(Math.ceil(left));
+    const pb = $('#prepBar'); if(pb){ pb.style.width = Math.max(0, Math.min(100, left / PREP_SECONDS * 100)) + '%'; pb.style.background = left <= 10 ? 'var(--bad)' : ''; }
+    if(left <= 0){ stopLoop(); cur.notes = $('#notes').value; cur.phase = 'talk'; cur.talk = 0; saveCur(); startTalk(); }
+  });
+}
+function startTalk(){
+  const c = CARD[cur.card];
+  $('#stageIn').innerHTML = `<p class="kicker"><span><b>Part 2</b></span><span>Your talk</span></p>
+    ${recbar('REC', true)}
+    ${cueHtml(c)}
+    ${cur.notes ? `<label class="notelab">Your notes</label><textarea class="notes" readonly>${esc(cur.notes)}</textarea>` : ''}
+    <div class="stagebtns" style="margin-top:20px"><button class="btn btn-primary" id="endTalk">Finish my talk</button><span class="hint">Recording stops by itself after 2 minutes.</span></div>`;
+  meter(); Rec.start(); toast('Recording started. You have up to 2 minutes.', '', 3000);
+  $('#endTalk').onclick = async () => {
+    if(TALK_SECONDS - cur.talk > 5 && !(await dialog('Finish your talk?', `You still have <b>${fmt(TALK_SECONDS - cur.talk)}</b> left. Recording keeps going until you decide.`, [{label:'Keep talking'}, {label:'Finish now', cls:'btn-primary', value:true}]))) return;
+    if(cur && cur.phase === 'talk'){ cur.endedEarly = TALK_SECONDS - cur.talk > 1; endTalk(); }
+  };
+  startLoop(dt => {
+    cur.talk += dt; const left = TALK_SECONDS - cur.talk;
+    setTimer('Talk left', left, left <= 15 ? 'danger' : left <= 30 ? 'warn' : '');
+    const rt = $('#recT'); if(rt) rt.textContent = fmt(cur.talk);
+    if(left <= 0){ cur.talk = TALK_SECONDS; endTalk(); }
+  });
+}
+async function endTalk(){
+  if(cur.phase !== 'talk') return;
+  stopLoop(); cur.phase = 'done';
+  document.querySelectorAll('.overlay').forEach(o => o.remove());
+  const r = Rec.stop();
+  if(r){ await DB.put('segs', {k: segKey(cur.attemptId, 99), bytes: r.bytes}).catch(() => {}); cur.segs = cur.segs.filter(g => g.part !== 2); cur.segs.push({part: 2, i: 99, dur: r.seconds}); }
+  saveCur(); Rec.release(); keepAwake(false); setTimer('', null);
+  $('#stageIn').innerHTML = `<p class="kicker"><span><b>Finished</b></span></p><h1 class="bigq">Putting your recording together...</h1><p style="color:var(--ink-2)">This takes a few seconds. Please keep this page open.</p>`;
+  finish();
+}
+
+/* ---------- finishing ---------- */
+async function finish(){
+  const done = cur;
+  const order = done.qs.map((q, i) => i).concat([99]);
+  const pieces = [], segments = []; let t = 0;
+  for(const i of order){
+    const meta = done.segs.find(g => g.i === i);
+    const q = i === 99 ? null : done.qs[i];
+    const label = i === 99 ? {part: 2, topic: '', q: CARD[done.card].title} : {part: 1, topic: TOP[q.topic].title, q: q.q};
+    let rec = null;
+    if(meta){ try{ rec = await DB.get('segs', segKey(done.attemptId, i)); }catch(e){} }
+    if(rec && rec.bytes && rec.bytes.length){
+      if(pieces.length){ pieces.push(silence()); t += silence().length * 8 / (KBPS * 1000); }
+      segments.push(Object.assign(label, {start: Math.round(t), dur: Math.round(meta.dur), reached: true}));
+      pieces.push(rec.bytes); t += rec.bytes.length * 8 / (KBPS * 1000);
+    } else segments.push(Object.assign(label, {start: 0, dur: 0, reached: false}));
+  }
+  const blob = new Blob(pieces, {type: 'audio/mpeg'});
+  const part1Seconds = Math.round(Math.min(P1_SECONDS, done.p1)), prepSeconds = Math.round(Math.min(PREP_SECONDS, done.prep || PREP_SECONDS)), talkSeconds = Math.round(Math.min(TALK_SECONDS, done.talk));
+  done.status = 'submitted'; done.submittedAt = new Date().toISOString();
+  hist.attempts.push({id: done.attemptId, date: done.submittedAt, band: 0, raw: 0, total: 0, ex: done.topics.concat(done.card), s: [part1Seconds, talkSeconds]});
+  done.topics.concat(done.card).forEach(id => { if(!hist.done.includes(id)) hist.done.push(id); });
+  saveHist();
+  const c = CARD[done.card];
+  const p = {
+    kind: 'speaking', attemptId: done.attemptId, name: profile.name, startedAt: done.startedAt, submittedAt: done.submittedAt,
+    activeSeconds: part1Seconds + prepSeconds + talkSeconds, overSeconds: 0, sessions: done.sessions || 1, shuffles: done.shuffles || 0,
+    raw: 0, total: 0, scaled: 0, band: 0, exercises: done.topics.concat(done.card).map(id => ({id})), mistakes: [],
+    segments, card: {title: c.title, say: c.say, notes: done.notes || ''}, part1Seconds, prepSeconds, prepSkipped: !!done.prepSkipped, talkSeconds, endedEarly: !!done.endedEarly,
+    audioName: `Speaking-${profile.name.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')}-${done.submittedAt.slice(0, 10)}.mp3`
+  };
+  try{ p.audio = await blobToB64(blob); }catch(e){ p.audio = ''; }
+  try{ await DB.put('outbox', p); }catch(e){}
+  LS.del(K.cur()); cur = null;
+  dropSegs(done.attemptId);
+  renderResults(done, p, blob);
+  send(p);
+}
+async function blobToB64(blob){
+  const b = new Uint8Array(await blob.arrayBuffer()); let s = '';
+  for(let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+function setMail(state, text, detail){
+  const m = $('#mail'); if(!m) return;
+  m.className = 'mail ' + state;
+  m.innerHTML = esc(text) + (state === 'bad' ? ' <button class="textbtn" id="retry">Try again</button>' : '') + (detail ? `<span style="display:block;margin-top:4px;font-weight:500;color:var(--ink-3);font-size:.86rem">Details for your teacher: ${esc(detail)}</span>` : '');
+  const r = $('#retry'); if(r) r.onclick = () => DB.get('outbox', m.dataset.id).then(p => { if(p) send(p); });
+}
+function send(p){
+  const m = $('#mail'); if(m) m.dataset.id = p.attemptId;
+  if(!ONLINE){ setMail('wait', 'Preview: your recording is not emailed from this preview.'); return; }
+  setMail('wait', 'Sending your recording to your teacher. This can take a minute on a slow connection...');
+  gas('submitAttempt', p).then(r => {
+    if(r && r.unconfirmed){ setMail('ok', 'Sent. Your browser could not confirm delivery, so the app will check again next time you open it.'); return; }
+    DB.del('outbox', p.attemptId).catch(() => {});
+    setMail('ok', 'Your teacher has received your recording.');
+  }).catch(err => setMail('bad', "Couldn't send yet. It will try again next time you open Speaking.", err && err.message));
+}
+function flushOutbox(){
+  if(!ONLINE) return;
+  DB.all('outbox').then(list => list.forEach(p => gas('submitAttempt', p).then(r => { if(!(r && r.unconfirmed)) DB.del('outbox', p.attemptId).catch(() => {}); }).catch(() => {}))).catch(() => {});
+}
+
+/* ---------- results ---------- */
+let audioFile = null;
+function downloadAudio(){
+  if(!audioFile) return;
+  const a = document.createElement('a'); a.href = audioFile.url; a.download = audioFile.name; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function renderResults(done, p, blob){
+  if(audioFile){ try{ URL.revokeObjectURL(audioFile.url); }catch(e){} }
+  audioFile = {url: URL.createObjectURL(blob), name: p.audioName};
+  $('#resWho').textContent = profile.name;
+  const reached = p.segments.filter(g => g.part === 1 && g.reached).length, total1 = p.segments.filter(g => g.part === 1).length;
+  const R = $('#results');
+  R.innerHTML = `<div class="score">
+      <div class="sstats"><div class="wstat"><div class="n num">${fmt(p.part1Seconds)}</div><div class="l">Part 1<small>${reached} of ${total1} questions</small></div></div><div class="wstat"><div class="n num">${fmt(p.talkSeconds)}</div><div class="l">Part 2 talk<small>of 2:00</small></div></div></div>
+      <div><h1>Your speaking test is finished.</h1>
+        <p>Your teacher will listen to your recording and give you a band score. Listen back below and notice what you would say differently next time.</p>
+        <div class="mail wait" id="mail">Sending your recording...</div>
+      </div></div>
+    <div class="save ready" id="saveBox"><div class="docicon" aria-hidden="true"><b>MP3</b></div><div><div class="txt"><b>${esc(p.audioName)}</b>Your recording is ready. Use the button below to download it.</div><button class="btn btn-line" id="dlBtn">Download recording</button></div></div>
+    <section class="listen"><h2>Listen back</h2><audio id="player" controls preload="metadata" src="${audioFile.url}"></audio>
+      <ol class="stamps">${p.segments.map(g => `<li class="${g.reached ? '' : 'miss'}"><button ${g.reached ? `data-t="${g.start}"` : 'disabled'}><span class="at num">${g.reached ? fmt(g.start) : ''}</span><span>${g.part === 1 ? `<span class="tp">Part 1, ${esc(g.topic)}</span>` : '<span class="tp">Part 2 talk</span>'}${esc(g.q)}</span><span class="d num">${g.reached ? fmt(g.dur) : 'Not reached'}</span></button></li>`).join('')}</ol>
+    </section>
+    <section class="wsec"><h2>Your Part 2 cue card</h2>${cueHtml(CARD[done.card])}${p.card.notes ? `<div class="wans"><h3>Your notes</h3><p style="white-space:pre-wrap">${esc(p.card.notes)}</p></div>` : ''}</section>
+    <div class="end"><button class="btn btn-primary" id="homeBtn">Back to home</button></div>`;
+  $('#dlBtn').onclick = downloadAudio;
+  R.querySelectorAll('.stamps button[data-t]').forEach(b => b.onclick = () => { const a = $('#player'); a.currentTime = +b.dataset.t; a.play().catch(() => {}); });
+  $('#homeBtn').onclick = enterHome;
+  show('screen-results');
+}
+
+/* ---------- home button ---------- */
+$('#homeFromResults').addEventListener('click', enterHome);
+$('#homeFromTest').addEventListener('click', async () => {
+  if(!cur || cur.status !== 'active'){ enterHome(); return; }
+  const ok = await dialog('Leave this test?', 'If you go back to the home page now, your recordings so far will be deleted and nothing is sent to your teacher. The same topics will be waiting as your next test.',
+    [{label:'Stay in the test', cls:'btn-primary'}, {label:'Leave and delete my recording', cls:'btn-line', value:true}]);
+  if(!ok || !cur) return;
+  stopLoop(); Rec.stop(); Rec.release();
+  const aid = cur.attemptId;
+  LS.set(K.next(), {topics: cur.topics, card: cur.card}); LS.del(K.cur()); cur = null;
+  dropSegs(aid);
+  enterHome();
+  toast('Test left. Your recording was deleted.');
+});
+window.addEventListener('pagehide', saveCur);
+
+/* ---------- boot ---------- */
+if(!ONLINE){ const n = document.createElement('div'); n.className = 'preview-note'; n.textContent = ENDPOINT ? 'Recordings cannot be sent: the address in config.js is not a valid Apps Script web app URL.' : (window.IRT_CONFIG ? 'Recordings are not being sent yet: add your Apps Script web app URL to config.js.' : 'Preview: everything works here except emailing.'); document.body.appendChild(n); setTimeout(() => n.remove(), 7000); }
+window.__irs = {get cur(){ return cur; }, Rec, TOP, CARD, skip: s => { if(cur.phase === 'p1') cur.p1 += s; if(cur.phase === 'prep') cur.prep += s; if(cur.phase === 'talk') cur.talk += s; }, DB};
+if(profile && profile.name){ if(!LS.get('ielts_profile', null)) LS.set('ielts_profile', profile); enterHome(); } else location.replace('index.html');
+})();
+</script>
+<script>/* booklet-layer v2: bold word limits + desk scene */
+(function(){
+  /* 1. word-limit instructions in bold */
+  var N='(?:ONE|TWO|THREE|FOUR|FIVE)', NUM='(?:AND\\s*/\\s*OR|AND OR|OR|AND)\\s+(?:A\\s+)?NUMBERS?';
+  var RE=new RegExp('\\b(?:NO MORE THAN '+N+' WORDS?(?:\\s+'+NUM+')?(?: TAKEN FROM THE PASSAGE)?|'+N+' WORDS?\\s+(?:ONLY|'+NUM+')|A NUMBER ONLY|NUMBERS? ONLY)','gi');
+  var TAIL=new RegExp('^(\\s*)('+NUM+')','i');
+  var SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1,INPUT:1,SELECT:1,OPTION:1,B:1,STRONG:1,CODE:1};
+  function boldIn(root){
+    if(!root)return;
+    if(root.nodeType===3){fix(root);return}
+    if(root.nodeType!==1||SKIP[root.tagName]||root.closest('.passage,.rp,b,strong'))return;
+    var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(t){
+      for(var e=t.parentElement;e&&e!==root.parentElement;e=e.parentElement){if(SKIP[e.tagName])return 2;if(e.classList&&(e.classList.contains('passage')||e.classList.contains('rp')))return 2}
+      return /word|number/i.test(t.nodeValue)?1:2}});
+    var list=[],t;while((t=w.nextNode()))list.push(t);list.forEach(fix);
+  }
+  function wrap(t,i,len){var mid=t.splitText(i);var rest=mid.splitText(len);var b=document.createElement('b');b.className='wl';mid.parentNode.insertBefore(b,mid);b.appendChild(mid);return rest}
+  function fix(t){
+    var p=t.parentElement;if(!p||SKIP[p.tagName]||p.closest('b,strong,.passage,.rp'))return;
+    var prev=t.previousSibling;
+    if(prev&&prev.nodeType===1&&/^(B|STRONG)$/.test(prev.tagName)&&/WORDS?\s*$/i.test(prev.textContent)){
+      var m0=TAIL.exec(t.nodeValue);if(m0){t=wrap(t,m0[1].length,m0[2].length)}}
+    var guard=0;
+    while(t&&guard++<8){RE.lastIndex=0;var m=RE.exec(t.nodeValue);if(!m)break;t=wrap(t,m.index,m[0].length)}
+  }
+  function boldAll(){boldIn(document.body)}
+
+  /* 2. desk scene */
+  var SV={
+    paper:'<svg viewBox="0 0 200 260"><rect x="1" y="1" width="198" height="258" rx="3" fill="var(--surface)" stroke="var(--rule)" stroke-width="2"/><line x1="34" y1="0" x2="34" y2="260" stroke="var(--bad)" stroke-opacity=".28" stroke-width="1.5"/>'+(function(){var o='';for(var y=40;y<250;y+=18)o+='<line x1="10" y1="'+y+'" x2="190" y2="'+y+'" stroke="var(--pen-line)" stroke-opacity=".55" stroke-width="1.2"/>';return o})()+'<path d="M46 58c14-6 28 4 44-2s30 2 52-3" fill="none" stroke="var(--accent)" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/><path d="M46 94c20-4 36 3 58-1" fill="none" stroke="var(--accent)" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/></svg>',
+    clip:'<svg viewBox="0 0 220 300"><rect x="4" y="16" width="212" height="280" rx="12" fill="var(--kraft)" stroke="var(--kraft-2)" stroke-width="2"/><rect x="22" y="44" width="176" height="236" rx="2" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5"/>'+(function(){var o='';for(var r=0;r<7;r++){var y=78+r*27;o+='<text x="36" y="'+(y+4)+'" font-family="Bricolage Grotesque,sans-serif" font-size="11" font-weight="700" fill="var(--ink-3)">'+(r+1)+'</text>';for(var c=0;c<4;c++){var x=70+c*30;var on=(r*3+c*5)%4===1;o+='<circle cx="'+x+'" cy="'+y+'" r="8" fill="'+(on?'var(--ink)':'none')+'" stroke="var(--ink-3)" stroke-width="1.5"/>'}}return o})()+'<rect x="70" y="2" width="80" height="34" rx="7" fill="var(--metal)"/><rect x="90" y="8" width="40" height="10" rx="5" fill="var(--kraft-2)"/></svg>',
+    pen:'<svg viewBox="0 0 320 28"><path d="M2 14 L22 9 L22 19 Z" fill="var(--ink-2)"/><rect x="22" y="6" width="56" height="16" rx="3" fill="var(--ink-3)"/><rect x="76" y="5" width="230" height="18" rx="9" fill="var(--accent)"/><rect x="230" y="1" width="70" height="5" rx="2.5" fill="var(--metal)"/><rect x="292" y="5" width="16" height="18" rx="6" fill="var(--accent-hover)"/></svg>',
+    pencil:'<svg viewBox="0 0 300 24"><path d="M2 12 L40 3 L40 21 Z" fill="var(--wood)"/><path d="M2 12 L14 9.2 L14 14.8 Z" fill="var(--ink)"/><rect x="40" y="3" width="220" height="18" fill="var(--ink-3)"/><rect x="40" y="9" width="220" height="2" fill="var(--ink-2)" opacity=".5"/><rect x="258" y="2" width="16" height="20" fill="var(--metal)"/><rect x="273" y="3" width="24" height="18" rx="5" fill="var(--bad)" opacity=".75"/></svg>',
+    ruler:'<svg viewBox="0 0 420 54"><rect x="1" y="1" width="418" height="52" rx="4" fill="var(--surface)" fill-opacity=".9" stroke="var(--ink-3)" stroke-opacity=".6" stroke-width="1.5"/>'+(function(){var o='';for(var i=0;i<=40;i++){var x=10+i*10,h=i%10===0?20:i%5===0?14:8;o+='<line x1="'+x+'" y1="1" x2="'+x+'" y2="'+(1+h)+'" stroke="var(--ink-3)" stroke-width="1.2"/>';if(i%10===0)o+='<text x="'+(x+3)+'" y="34" font-family="Bricolage Grotesque,sans-serif" font-size="10" font-weight="700" fill="var(--ink-3)">'+(i/10)+'</text>'}return o})()+'</svg>'
+  };
+  /* w = width px, pos = css, r = resting rotation, from = where it slides in from */
+  var SCENES={
+    home:[
+      {k:'clip',w:230,pos:{left:'-100px',top:'20vh'},r:-8,from:[-360,40]},
+      {k:'pen',w:300,pos:{left:'-120px',bottom:'10vh'},r:-16,from:[-420,120]},
+      {k:'paper',w:210,pos:{right:'-70px',top:'16vh'},r:8,from:[380,-40]},
+      {k:'ruler',w:420,pos:{right:'-230px',bottom:'18vh'},r:-24,from:[480,160]},
+      {k:'pencil',w:280,pos:{right:'-40px',bottom:'4vh'},r:-6,from:[420,60]}
+    ],
+    results:[
+      {k:'paper',w:210,pos:{left:'-80px',top:'14vh'},r:-7,from:[-380,-30]},
+      {k:'ruler',w:420,pos:{left:'-250px',bottom:'22vh'},r:22,from:[-480,140]},
+      {k:'clip',w:230,pos:{right:'-90px',top:'30vh'},r:9,from:[380,60]},
+      {k:'pen',w:300,pos:{right:'-120px',bottom:'7vh'},r:14,from:[440,100]}
+    ],
+    welcome:[
+      {k:'paper',w:200,pos:{left:'-128px',top:'-20px'},r:-10,from:[-360,-60]},
+      {k:'pencil',w:280,pos:{left:'-70px',bottom:'12vh'},r:-28,from:[-420,160]},
+      {k:'ruler',w:420,pos:{left:'8vw',bottom:'-24px'},r:-3,from:[-200,220]}
+    ]
+  };
+  var EASE='cubic-bezier(.65,0,.35,1)', still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var layer=document.createElement('div');layer.className='deco';layer.setAttribute('aria-hidden','true');
+  var scene=null;
+  function build(name){
+    layer.innerHTML='';
+    (SCENES[name]||[]).forEach(function(it,i){
+      var el=document.createElement('i');el.className='d d-'+it.k;el.innerHTML=SV[it.k];el.style.width=it.w+'px';
+      for(var k in it.pos)el.style[k]=it.pos[k];
+      layer.appendChild(el);
+      var end='translate(0,0) rotate('+it.r+'deg)';
+      if(still){el.style.opacity=1;el.style.transform=end;return}
+      el.animate([{opacity:0,transform:'translate('+it.from[0]+'px,'+it.from[1]+'px) rotate('+(it.r+(it.from[0]<0?-14:14))+'deg)'},{opacity:1,transform:end}],
+        {duration:1500,delay:250+i*160,easing:EASE,fill:'both'});
+    });
+  }
+  function leave(){
+    [].forEach.call(layer.children,function(el,i){
+      if(still){el.style.opacity=0;return}
+      var tr=getComputedStyle(el).transform;
+      el.animate([{opacity:1,transform:tr==='none'?'none':tr},{opacity:0,transform:(tr==='none'?'':tr+' ')+'translateY(40px)'}],{duration:500,delay:i*40,easing:EASE,fill:'both'});
+    });
+  }
+  function current(){
+    var v=[].filter.call(document.querySelectorAll('.screen'),function(s){return !s.classList.contains('hidden')&&!s.hidden})[0];
+    if(!v)return null;var id=v.id.replace('screen-','');
+    return id==='test'?'test':(id==='results'?'results':(id==='welcome'?'welcome':'home'));
+  }
+  function sync(){
+    var n=current();if(!n||n===scene)return;
+    var prev=scene;scene=n;
+    if(n==='test'){leave();return}
+    build(n);
+  }
+  function init(){
+    document.body.insertBefore(layer,document.body.firstChild);
+    boldAll();sync();
+    new MutationObserver(function(ms){
+      var screens=false;
+      ms.forEach(function(m){
+        if(m.type==='attributes'){if(m.target.classList&&m.target.classList.contains('screen'))screens=true;return}
+        m.addedNodes.forEach(function(n){if(n!==layer&&!(n.closest&&n.closest('.deco')))boldIn(n.nodeType===3?n:n)});
+      });
+      if(screens)sync();
+    }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();</script>
+</body>
+</html>
