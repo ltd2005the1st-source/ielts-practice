@@ -403,7 +403,6 @@ a.wordmark{color:var(--ink);text-decoration:none}
 @keyframes drift{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(14px,-18px) rotate(12deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 @keyframes sheen{from{background-position:-200% 0}to{background-position:200% 0}}
-html{scroll-behavior:smooth}
 ::selection{background:var(--sun);color:var(--sun-ink)}
 *{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
 h1,h2,h3{letter-spacing:-.03em}
@@ -872,6 +871,7 @@ b.wl{font-weight:800}
 .rp.trs p.nar b{color:var(--ink-3)}
 .cn.flash,mark.clue.flash{outline:3px solid var(--accent);outline-offset:1px}
 </style>
+<script src="scroll.js"></script>
 </head>
 <body>
 <div class="toasts" id="toasts" aria-live="polite"></div>
@@ -1437,7 +1437,7 @@ function renderTest(){
   $('#tabs').innerHTML = parts.map(p => `<button class="tab" data-p="${p}"><span>Part ${p}</span><small class="num" data-c="${p}"></small></button>`).join('') + '<span class="tab-line" id="tabLine"></span>';
   $('#pjump').innerHTML = parts.map(p => `<button data-p="${p}">Part ${p}</button>`).join('');
   $('#pjump').querySelectorAll('button').forEach(b => b.onclick = () => jumpPart(+b.dataset.p));
-  $('#tabs').querySelectorAll('.tab').forEach(b => b.onclick = () => { const h = document.getElementById('part-' + b.dataset.p); if(h) h.scrollIntoView({behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start'}); setActiveTab(+b.dataset.p); });
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.onclick = () => { const h = document.getElementById('part-' + b.dataset.p); if(h) DBScroll.glideIntoView(h, {block: 'start'}); setActiveTab(+b.dataset.p); });
   let html = '', lastPart = 0;
   e.blocks.forEach(b => {
     if(b.part !== lastPart){ lastPart = b.part; html += `<h2 class="parthead" id="part-${b.part}">Part ${b.part}<small>Questions ${(b.part - 1) * 10 + 1}-${b.part * 10}</small></h2>`; }
@@ -1450,15 +1450,25 @@ function renderTest(){
   setActiveTab(1);
   // keep the active tab in step with scrolling
   if('IntersectionObserver' in window){
-    const io = new IntersectionObserver(ents => { ents.forEach(en => { if(en.isIntersecting) setActiveTab(+en.target.id.split('-')[1]); }); }, {root: $('#lpane'), rootMargin: '0px 0px -70% 0px'});
+    // while a part jump is gliding, the highlight stays on where you're going instead of flickering past
+    const io = new IntersectionObserver(ents => { if(DBScroll.isJumping($('#lpane'))) return; ents.forEach(en => { if(en.isIntersecting) setActiveTab(+en.target.id.split('-')[1]); }); }, {root: $('#lpane'), rootMargin: '0px 0px -70% 0px'});
     qin.querySelectorAll('.parthead').forEach(h => io.observe(h));
   }
   renderNav();
 }
 let navPart = 1;
+// after a jump ends (or you take over mid-glide), settle the highlight on the part now on screen
+window.addEventListener('dbscroll:jumped', e => {
+  const pane = $('#lpane'); if(!pane || e.detail.scroller !== pane) return;
+  const line = pane.getBoundingClientRect().top + pane.clientHeight * 0.3;
+  let p = 0; pane.querySelectorAll('.parthead').forEach(h => { if(h.getBoundingClientRect().top <= line) p = +h.id.split('-')[1]; });
+  const hs = pane.querySelectorAll('.parthead');
+  if(hs.length && pane.scrollTop + pane.clientHeight >= pane.scrollHeight - 2) p = +hs[hs.length - 1].id.split('-')[1]; // the very bottom is always the last part
+  if(p) setActiveTab(p);
+});
 function jumpPart(p){
   const h = document.getElementById('part-' + p);
-  if(h) h.scrollIntoView({behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start'});
+  if(h) DBScroll.glideIntoView(h, {block: 'start'});
   setActiveTab(p);
 }
 function setActiveTab(p){
@@ -1581,7 +1591,7 @@ function goToQ(n){
   if(!el){ const m = multisOf(EX[cur.testId]).find(m => m.qs.includes(n)); if(m) el = document.getElementById('q-' + m.qs[0]); }
   if(!el) return;
   const box = el.closest('.qitem') || el;
-  box.scrollIntoView({behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center'});
+  DBScroll.glideIntoView(box, {block: 'center'});
   box.classList.add('flash'); setTimeout(() => box.classList.remove('flash'), 900);
   const f = el.matches('input,select') ? el : el.querySelector('input,select,button'); if(f) setTimeout(() => f.focus({preventScroll: true}), 350);
 }
@@ -1842,7 +1852,7 @@ function fillTranscript(e, pi){
     for(let m = n - 1; !target && m >= n - 4; m--) target = document.getElementById('r-' + m);
     if(!target) return;
     if(target.classList.contains('hidden')) document.querySelector('.filter [data-f="all"]').click();
-    target.scrollIntoView({behavior: 'smooth', block: 'center'}); target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
+    DBScroll.glideIntoView(target, {block: 'center'}); target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
   });
 }
 function addClues(root, clues){
@@ -1941,9 +1951,9 @@ function renderResults(g, done, answered){
     det.open = true; fillTranscript(e, pi);
     const box = document.getElementById('rp-' + pi), mk = box.querySelector(`.cn[data-q~="${b.dataset.q}"]`);
     if(!mk) return;
-    det.scrollIntoView({behavior: 'smooth', block: 'start'});
+    DBScroll.glideIntoView(det, {block: 'start'});
     setTimeout(() => {
-      box.scrollTo({top: box.scrollTop + mk.getBoundingClientRect().top - box.getBoundingClientRect().top - 60, behavior: 'smooth'});
+      DBScroll.glideTo(box, box.scrollTop + mk.getBoundingClientRect().top - box.getBoundingClientRect().top - 60);
       const marks = [mk, ...box.querySelectorAll(`mark.clue[data-q~="${b.dataset.q}"]`)];
       marks.forEach(m => m.classList.add('flash')); setTimeout(() => marks.forEach(m => m.classList.remove('flash')), 1800);
     }, 350);
@@ -1951,7 +1961,7 @@ function renderResults(g, done, answered){
   R.querySelectorAll('.cell').forEach(c => c.onclick = () => {
     const t = document.getElementById(c.dataset.rid); if(!t) return;
     if(t.classList.contains('hidden')) R.querySelector('.filter [data-f="all"]').click();
-    t.scrollIntoView({behavior: 'smooth', block: 'center'}); t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
+    DBScroll.glideIntoView(t, {block: 'center'}); t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
   });
   R.querySelectorAll('.filter .seg button').forEach(b => b.onclick = () => {
     R.querySelectorAll('.filter .seg button').forEach(x => x.classList.toggle('on', x === b));

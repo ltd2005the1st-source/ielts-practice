@@ -403,7 +403,6 @@ a.wordmark{color:var(--ink);text-decoration:none}
 @keyframes drift{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(14px,-18px) rotate(12deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 @keyframes sheen{from{background-position:-200% 0}to{background-position:200% 0}}
-html{scroll-behavior:smooth}
 ::selection{background:var(--sun);color:var(--sun-ink)}
 *{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
 h1,h2,h3{letter-spacing:-.03em}
@@ -874,6 +873,7 @@ b.wl{font-weight:800}
 @media (min-width:900px) and (max-width:1279px){.deco .d{scale:.65}}
 
 </style>
+<script src="scroll.js"></script>
 </head>
 <body>
 <div class="toasts" id="toasts" aria-live="polite"></div>

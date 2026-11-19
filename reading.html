@@ -405,7 +405,6 @@ a.wordmark{color:var(--ink);text-decoration:none}
 @keyframes drift{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(14px,-18px) rotate(12deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 @keyframes sheen{from{background-position:-200% 0}to{background-position:200% 0}}
-html{scroll-behavior:smooth}
 ::selection{background:var(--sun);color:var(--sun-ink)}
 *{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
 h1,h2,h3{letter-spacing:-.03em}
@@ -800,6 +799,7 @@ b.wl{font-weight:800}
 @media (min-width:900px) and (max-width:1279px){.deco .d{scale:.65}}
 
 </style>
+<script src="scroll.js"></script>
 </head>
 <body>
 <div class="toasts" id="toasts" aria-live="polite"></div>
@@ -1427,7 +1427,7 @@ function goToQ(n){
   if(!el){ const b = EX[cur.exIds[partIdx]].blocks.find(b => b.multi && b.multi.qs.includes(n)); if(b) el = document.getElementById('q-' + b.multi.qs[0]); }
   if(!el) return;
   const box = el.closest('.qitem') || el;
-  box.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center'});
+  DBScroll.glideIntoView(box, {block: 'center'});
   box.classList.add('flash'); setTimeout(() => box.classList.remove('flash'), 900);
   const f = el.matches('input,select') ? el : el.querySelector('input,select,button'); if(f) setTimeout(() => f.focus({preventScroll: true}), 350);
 }
@@ -1732,9 +1732,9 @@ function renderResults(g, done, answered){
     det.open = true; fillPassage(p);
     const box = document.getElementById('rp-' + p.pi), mk = box.querySelector(`.cn[data-q~="${b.dataset.q}"]`);
     if(!mk) return;
-    det.scrollIntoView({behavior: 'smooth', block: 'start'});
+    DBScroll.glideIntoView(det, {block: 'start'});
     setTimeout(() => {
-      box.scrollTo({top: box.scrollTop + mk.getBoundingClientRect().top - box.getBoundingClientRect().top - 60, behavior: 'smooth'});
+      DBScroll.glideTo(box, box.scrollTop + mk.getBoundingClientRect().top - box.getBoundingClientRect().top - 60);
       const marks = [mk, ...box.querySelectorAll(`mark.clue[data-q~="${b.dataset.q}"]`)];
       marks.forEach(m => m.classList.add('flash')); setTimeout(() => marks.forEach(m => m.classList.remove('flash')), 1800);
     }, 350);
@@ -1742,7 +1742,7 @@ function renderResults(g, done, answered){
   R.querySelectorAll('.cell').forEach(c => c.onclick = () => {
     const t = document.getElementById(c.dataset.rid); if(!t) return;
     if(t.classList.contains('hidden')) R.querySelector('.filter [data-f="all"]').click();
-    t.scrollIntoView({behavior: 'smooth', block: 'center'}); t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
+    DBScroll.glideIntoView(t, {block: 'center'}); t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
   });
   R.querySelectorAll('.filter .seg button').forEach(b => b.onclick = () => {
     R.querySelectorAll('.filter .seg button').forEach(x => x.classList.toggle('on', x === b));
@@ -1776,7 +1776,7 @@ function fillPassage(p){
       [...document.querySelectorAll(`.rpart[data-pi="${p.pi}"] .findbtn`)].map(b => b.closest('.ritem')).find(r => r && r.querySelector(`.findbtn[data-q="${n}"]`));
     if(!target) return;
     if(target.classList.contains('hidden')) document.querySelector('.filter [data-f="all"]').click();
-    target.scrollIntoView({behavior: 'smooth', block: 'center'}); target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
+    DBScroll.glideIntoView(target, {block: 'center'}); target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
   });
 }
 function addClues(root, clues){
