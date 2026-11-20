@@ -20,10 +20,24 @@
   var reduced = function(){ return matchMedia('(prefers-reduced-motion: reduce)').matches; };
   var rootEl = function(){ return document.scrollingElement || document.documentElement; };
 
+  var nearInt = function(v){ return Math.abs(v - Math.round(v)) < 0.02; };
   function isWheelNotch(e){
     if(e.deltaMode !== 0) return true; // lines or pages: always a real wheel
+    if(e.deltaX !== 0 || !e.deltaY) return false;
+    var d = Math.abs(e.deltaY);
     // Mouse wheels send big whole-number steps with no sideways part; trackpads send small fractional ones.
-    return Math.abs(e.deltaY) >= 40 && Number.isInteger(e.deltaY) && e.deltaX === 0;
+    if(d >= 40 && Number.isInteger(e.deltaY)) return true;
+    // With page zoom or Windows display scaling (110%, 125%, 150%...) Chrome and Edge divide each
+    // notch by the zoom, so it arrives as e.g. 66.67 or 90.91. The legacy wheelDeltaY still counts
+    // whole 120-unit wheel ticks, and trackpads in Chrome/Safari give exactly -3 x deltaY instead.
+    var w = e.wheelDeltaY;
+    if(typeof w === 'number' && w !== 0){
+      if(Math.abs(w + 3 * e.deltaY) < 0.5) return false;
+      if(Math.abs(w) % 120 === 0 && d >= 20) return true;
+    }
+    // Browsers without wheelDeltaY: a zoomed notch is still a whole number of device pixels.
+    var z = window.devicePixelRatio || 1;
+    return d >= 30 && nearInt(d * z);
   }
 
   function isScrollerStyle(el){
@@ -133,6 +147,17 @@
       mx = e.clientX; my = e.clientY;
     }
     window.addEventListener('wheel', onWheel, {passive: false});
+    // Open any page with ?wheel to see what each wheel event reports and whether it glides.
+    if(/[?&]wheel\b/.test(location.search)){
+      var badge = document.createElement('div');
+      badge.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:99999;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.8);color:#fff;font:12px/1.4 ui-monospace,monospace;pointer-events:none;white-space:pre';
+      badge.textContent = 'Spin the mouse wheel';
+      var addBadge = function(){ document.body.appendChild(badge); };
+      if(document.body) addBadge(); else document.addEventListener('DOMContentLoaded', addBadge);
+      window.addEventListener('wheel', function(e){
+        badge.textContent = 'deltaY ' + e.deltaY + '  mode ' + e.deltaMode + '\nwheelDeltaY ' + e.wheelDeltaY + '  deltaX ' + e.deltaX + '\nzoom x' + (window.devicePixelRatio || 1) + '\n' + (isWheelNotch(e) ? 'mouse wheel: glides' : 'trackpad: native');
+      }, {passive: true, capture: true});
+    }
     window.addEventListener('pointerdown', cancel, true);
     window.addEventListener('pointermove', onMove, {passive: true, capture: true});
     window.addEventListener('touchstart', cancel, {passive: true, capture: true});
