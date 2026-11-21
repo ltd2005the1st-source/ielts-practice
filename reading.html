@@ -105,7 +105,7 @@ h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
 .home h1{font-size:clamp(2rem,4.4vw,3.1rem);line-height:1.05}
 .home .lede{color:var(--ink-2);font-size:1.05rem;margin:.6em 0 0;max-width:62ch}
 .trio{list-style:none;margin:36px 0 0;padding:0;border-top:2px solid var(--rule-strong)}
-.trio li{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:20px;align-items:center;padding:22px 0;border-bottom:1px solid var(--rule)}
+.trio li{display:grid;grid-template-columns:72px minmax(0,1fr);gap:20px;align-items:center;padding:22px 0;border-bottom:1px solid var(--rule)}
 .trio .pn{font-size:2.6rem;font-weight:800;line-height:1;color:var(--accent)}
 .trio h3{font-size:clamp(1.1rem,2vw,1.35rem);font-weight:700;letter-spacing:-.01em;line-height:1.25}
 .trio .meta{color:var(--ink-3);font-size:.92rem;margin-top:4px}
@@ -955,7 +955,7 @@ window.IRTReport = (function(){
       const tl = wrap(ctx, p.e.title, 560);
       tl.forEach((l, i) => T(l, PAD, y + 26 + i * 32, f(700, 26), C.ink));
       const ty = y + 26 + tl.length * 32;
-      T(`Part ${p.pi + 1}, ${p.e.tier}`, PAD, ty + 4, f(500, 19), C.ink3);
+      T(`Part ${p.pi + 1}`, PAD, ty + 4, f(500, 19), C.ink3);
       T(`${p.score}`, W - PAD - 52, y + 30, f(800, 34), C.ink, 'right');
       T(`/ ${p.total}`, W - PAD, y + 30, f(600, 20), C.ink3, 'right');
       // cells on next row
@@ -1193,7 +1193,7 @@ function enterHome(){
   flushOutbox();
 }
 function trioHtml(ids){
-  return ids.map((id, i) => { const e = EX[id]; return `<li><span class="pn num">${i+1}</span><div><h3>${esc(e.title)}</h3><div class="meta">${plural(e.questions.length, 'question')}</div></div><span class="diff" data-l="${LEVEL[e.tier]}"><i><b></b><b></b><b></b></i>${cap(e.tier)}</span></li>`; }).join('');
+  return ids.map((id, i) => { const e = EX[id]; return `<li><span class="pn num">${i+1}</span><div><h3>${esc(e.title)}</h3><div class="meta">${plural(e.questions.length, 'question')}</div></div></li>`; }).join('');
 }
 function renderHome(){
   const first = profile.name.split(' ').slice(-1)[0];
@@ -1224,7 +1224,7 @@ function renderHome(){
 function renderNewOnly(){
   const can = canNewOnly(), box = $('#newOnly'), note = $('#newOnlyNote');
   box.disabled = !can; box.checked = newOnly(); note.hidden = can;
-  if(!can) note.textContent = `You have done every ${fullTiers().join(' and ')} passage, so passages you have done before will come up again. Clear your past attempts below to get only new passages.`;
+  if(!can) note.textContent = `You have done every passage for ${fullTiers().map(t => 'Part ' + (TIERS.indexOf(t) + 1)).join(' and ')}, so passages you have done before will come up again. Clear your past attempts below to get only new passages.`;
 }
 $('#newOnly').addEventListener('change', () => {
   LS.set(K.newOnly(), $('#newOnly').checked);
@@ -1308,7 +1308,7 @@ function renderPart(i){
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', +b.dataset.i === i));
   moveTabLine();
   const pin = $('#pin'), qin = $('#qin');
-  pin.innerHTML = `<h2 class="ptitle">${esc(e.title)}</h2><div class="pmeta"><span>Part ${i+1}</span><span class="diff" data-l="${LEVEL[e.tier]}"><i><b></b><b></b><b></b></i>${cap(e.tier)}</span></div>` + e.passage;
+  pin.innerHTML = `<h2 class="ptitle">${esc(e.title)}</h2><div class="pmeta"><span>Part ${i+1}</span></div>` + e.passage;
   unwrapExtras(pin);
   qin.innerHTML = e.blocks.map(b => `<section class="qsec"><h3>${esc(b.head)}</h3><div class="qb">${b.html}</div></section>`).join('');
   [pin, qin].forEach(r => r.querySelectorAll('table').forEach(t => { const w = document.createElement('div'); w.className = 'tbl'; t.replaceWith(w); w.appendChild(t); }));
@@ -1719,7 +1719,7 @@ function renderResults(g, done, answered){
         <div class="mail wait" id="mail">Sending your results...</div>
       </div></div>
     <div class="save" id="saveBox"><div class="thumbwrap" aria-hidden="true"><img class="thumb" id="thumb" alt="" draggable="false"></div><div><div class="txt" id="saveTxt">Creating your report image...</div><button class="btn btn-line" id="dlBtn" disabled>Download report</button></div></div>
-    <div class="maps">${g.parts.map(p => `<div class="map"><div class="t">${esc(p.e.title)}<small>Part ${p.pi + 1}, ${p.e.tier}</small></div><div class="s num">${p.score}<small> / ${p.total}</small></div><div class="cells">${cells.filter(c => c.pi === p.pi).map((c, i) => `<button class="cell ${c.cls} num" data-rid="${c.rid}" style="animation-delay:${Math.min(i * 18, 600)}ms" aria-label="Question ${c.n}, ${c.cls === 'blank' ? 'not answered' : c.cls}">${c.n}</button>`).join('')}</div></div>`).join('')}</div>
+    <div class="maps">${g.parts.map(p => `<div class="map"><div class="t">${esc(p.e.title)}<small>Part ${p.pi + 1}</small></div><div class="s num">${p.score}<small> / ${p.total}</small></div><div class="cells">${cells.filter(c => c.pi === p.pi).map((c, i) => `<button class="cell ${c.cls} num" data-rid="${c.rid}" style="animation-delay:${Math.min(i * 18, 600)}ms" aria-label="Question ${c.n}, ${c.cls === 'blank' ? 'not answered' : c.cls}">${c.n}</button>`).join('')}</div></div>`).join('')}</div>
     <div class="filter"><h2>Review</h2><div class="seg" role="radiogroup" aria-label="Filter"><button class="on" data-f="all">All</button><button data-f="bad">Mistakes</button><button data-f="correct">Correct</button></div><div class="key"><span class="k1">Correct</span><span class="k2">Wrong</span><span class="k3">Not answered</span></div></div>
     ${parts.map(x => x.html).join('')}
     <div class="end"><button class="btn btn-primary" id="homeBtn">Back to home</button></div>`;
