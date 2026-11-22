@@ -846,6 +846,26 @@ b.wl{font-weight:800}
 @media (min-width:1280px) and (max-width:1439px){.deco .d{scale:.85}}
 @media (min-width:900px) and (max-width:1279px){.deco .d{scale:.65}}
 
+/* ---------- question type filters ---------- */
+.ptypes{margin-top:28px;display:grid;gap:18px}
+.tgroup .thead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.tgroup h2{font-size:1rem;font-weight:700;letter-spacing:0}
+.tgroup .textbtn{font-size:.88rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.tchip{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1.5px solid var(--rule);border-radius:var(--r-ctl);background:var(--surface);color:var(--ink-2);font-weight:600;font-size:.94rem;cursor:pointer;user-select:none;transition:background-color .2s,border-color .2s,color .2s}
+.tchip input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.tchip .tick{width:16px;height:16px;border:1.5px solid var(--ink-3);border-radius:5px;display:grid;place-items:center;flex:none;transition:background-color .2s,border-color .2s}
+.tchip .tick::after{content:'';width:8px;height:4px;border-left:2px solid var(--accent-ink);border-bottom:2px solid var(--accent-ink);transform:translateY(-1px) rotate(-45deg);opacity:0;transition:opacity .15s}
+.tchip .n{color:var(--ink-3);font-weight:500;font-size:.85rem}
+.tchip:hover{border-color:var(--ink-3);color:var(--ink)}
+.tchip:has(input:checked){border-color:var(--accent);background:var(--accent-tint);color:var(--ink)}
+.tchip input:checked+.tick{background:var(--accent);border-color:var(--accent)}
+.tchip input:checked+.tick::after{opacity:1}
+.tchip:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.ptypes .tnote{margin:0;max-width:62ch;font-size:.9rem;color:var(--ink-3)}
+.ptypes .tnote.bad{color:var(--bad);font-weight:600}
+.trio li.empty-task h3{color:var(--ink-3)}
+@media (max-width:599px){.tchip{min-height:44px}}
 </style>
 <script src="scroll.js"></script>
 </head>
@@ -864,8 +884,9 @@ b.wl{font-weight:800}
       <div class="actions">
         <button class="btn btn-primary" id="startBtn">Start test</button>
         <button class="btn btn-line" id="shuffleBtn">Shuffle</button>
-        <span class="hint">Shuffle picks a different Task 1 and Task 2. The timer starts when you press Start test.</span>
+        <span class="hint">Shuffle picks a different Task 1 and Task 2 from the question types you choose below. The timer starts when you press Start test.</span>
       </div>
+      <div class="ptypes" id="ptypes" aria-label="Question types"></div>
       <div class="newonly">
         <label class="check"><input type="checkbox" id="newOnly"><span class="box" aria-hidden="true"></span><span>Only tasks I have not done before</span></label>
         <p class="note" id="newOnlyNote" hidden></p>
@@ -982,6 +1003,7 @@ const K = {
   next: () => 'irw_next_' + slug(profile.name),
   shuf: () => 'irw_shuf_' + slug(profile.name),
   newOnly: () => 'irw_newonly_' + slug(profile.name),
+  types: () => 'irw_types_' + slug(profile.name),
   clr: () => 'irw_clear_' + slug(profile.name)
 };
 const loadHist = () => { hist = LS.get(K.hist(), {done: [], attempts: []}); };
@@ -1017,8 +1039,18 @@ function isDone(id){ const e = EX[id]; return hist.done.includes(id) || !!(e && 
 const fullTasks = () => [TASK1, TASK2].map((L, i) => L.some(e => !isDone(e.id)) ? null : 'Task ' + (i + 1)).filter(Boolean);
 const canNewOnly = () => !fullTasks().length;
 const newOnly = () => LS.get(K.newOnly(), true) !== false && canNewOnly();
+/* question types: students choose which kinds of Task 1 and Task 2 prompts can come up */
+const TYPE_LABEL = {'Diagram': 'Process diagram'};
+const TYPES = [TASK1, TASK2].map(L => [...new Set(L.map(e => e.type))]);
+const typeLabel = t => TYPE_LABEL[t] || t;
+const offTypes = () => { const o = LS.get(K.types(), null); return [1, 2].map(i => (o && Array.isArray(o[i - 1]) ? o[i - 1] : []).filter(t => TYPES[i - 1].includes(t))); };
+const typeOk = e => !!e && !offTypes()[e.task - 1].includes(e.type);
+const typePool = i => [TASK1, TASK2][i].filter(typeOk);
+const typesReady = () => typePool(0).length > 0 && typePool(1).length > 0;
 function pickOne(list, avoid){
   const lastDone = {}; hist.attempts.forEach(a => (a.ex || []).forEach(id => lastDone[id] = a.date || ''));
+  list = list.filter(typeOk);
+  if(!list.length) return null;
   let pool = list.filter(e => !newOnly() || !isDone(e.id)).map(e => e.id);
   if(!pool.length){
     pool = list.slice().sort((a, b) => (lastDone[a.id] || '').localeCompare(lastDone[b.id] || '')).map(e => e.id);
@@ -1031,7 +1063,7 @@ function pickOne(list, avoid){
 const pickPair = avoid => [pickOne(TASK1, avoid && avoid[0]), pickOne(TASK2, avoid && avoid[1])];
 function nextPair(){
   const saved = LS.get(K.next(), null), only = newOnly();
-  if(saved && saved.length === 2 && saved.every((id, i) => EX[id] && EX[id].task === i + 1 && (!only || !isDone(id)))) return saved;
+  if(saved && saved.length === 2 && saved.every((id, i) => EX[id] && EX[id].task === i + 1 && typeOk(EX[id]) && (!only || !isDone(id)))) return saved;
   const t = pickPair(); LS.set(K.next(), t); LS.set(K.shuf(), 0); return t;
 }
 
@@ -1052,7 +1084,9 @@ function enterHome(){
   flushOutbox();
 }
 function pairHtml(ids){
-  return ids.map((id, i) => { const e = EX[id]; return `<li><span class="pn num">${i + 1}</span><div><h3>${esc(firstLine(e))}</h3><div class="wtype">Task ${e.task}, ${esc(e.type.toLowerCase())}. At least ${MIN_WORDS[e.task]} words, about ${SUGGEST[e.task]} minutes.</div></div></li>`; }).join('');
+  return ids.map((id, i) => { const e = EX[id];
+    if(!e) return `<li class="empty-task"><span class="pn num">${i + 1}</span><div><h3>No Task ${i + 1} question types chosen</h3><div class="wtype">Choose at least one Task ${i + 1} type below to build your test.</div></div></li>`;
+    return `<li><span class="pn num">${i + 1}</span><div><h3>${esc(firstLine(e))}</h3><div class="wtype">Task ${e.task}, ${esc(typeLabel(e.type).toLowerCase())}. At least ${MIN_WORDS[e.task]} words, about ${SUGGEST[e.task]} minutes.</div></div></li>`; }).join('');
 }
 function renderHome(){
   const first = profile.name.split(' ').slice(-1)[0];
@@ -1080,8 +1114,52 @@ function renderHome(){
     `<table class="htable"><thead><tr><th>Date</th><th>Task 1</th><th>Task 2</th><th class="pas">Questions</th><th class="rm"><span class="sr">Remove</span></th></tr></thead><tbody>${hist.attempts.slice().reverse().map(a => `<tr><td>${dt(a)}</td><td class="num">${(a.w || [])[0] != null ? a.w[0] + ' words' : ''}</td><td class="num">${(a.w || [])[1] != null ? a.w[1] + ' words' : ''}</td><td class="pas">${(a.ex || []).map(id => EX[id] ? esc(EX[id].type) : esc(id)).join(', ')}</td><td class="rm"><button class="rmbtn" data-id="${esc(a.id)}" aria-label="Remove the attempt from ${dt(a)}">Remove</button></td></tr>`).join('')}</tbody></table>`;
   $('#clearAll').hidden = !n;
   $('#histBox').querySelectorAll('.rmbtn').forEach(b => b.onclick = () => removeAttempt(b.dataset.id));
-  renderNewOnly();
+  renderNewOnly(); renderTypes();
 }
+function setTrio(t, anim){
+  LS.set(K.next(), t);
+  const ol = $('#trio'); ol.classList.remove('swap'); ol.innerHTML = pairHtml(t);
+  if(anim){ void ol.offsetWidth; ol.classList.add('swap'); }
+}
+function renderTypes(){
+  const off = offTypes();
+  $('#ptypes').innerHTML = [0, 1].map(i => {
+    const L = [TASK1, TASK2][i], all = !off[i].length;
+    return `<div class="tgroup" data-task="${i + 1}"><div class="thead"><h2>Task ${i + 1} question types</h2><button type="button" class="textbtn" data-all="${i + 1}">${all ? 'Clear all' : 'Select all'}</button></div><div class="chips">${TYPES[i].map(t => `<label class="tchip"><input type="checkbox" data-task="${i + 1}" value="${esc(t)}"${off[i].includes(t) ? '' : ' checked'}><span class="tick" aria-hidden="true"></span><span>${esc(typeLabel(t))}</span><span class="n num">${L.filter(e => e.type === t).length}</span></label>`).join('')}</div></div>`;
+  }).join('') + '<p class="note tnote" id="typesNote" hidden></p>';
+  renderTypesNote();
+}
+function renderTypesNote(){
+  const note = $('#typesNote'); if(!note) return;
+  const missing = [0, 1].filter(i => !typePool(i).length).map(i => 'Task ' + (i + 1));
+  const ready = !missing.length;
+  $('#startBtn').disabled = !ready; $('#shuffleBtn').disabled = !ready;
+  note.classList.toggle('bad', !ready);
+  if(!ready){ note.hidden = false; note.textContent = `No questions match your choices for ${missing.join(' and ')}. Choose at least one type for each task to start a test.`; return; }
+  const used = [0, 1].filter(i => newOnly() && !typePool(i).some(e => !isDone(e.id))).map(i => 'Task ' + (i + 1));
+  note.hidden = !used.length;
+  if(used.length) note.textContent = `You have done every ${used.join(' and ')} question of the types you chose, so questions you have done before will come up. Add more types to get new ones.`;
+}
+function setTypes(task, off){
+  const o = offTypes(); o[task - 1] = off; LS.set(K.types(), o);
+  const old = LS.get(K.next(), null) || [null, null];
+  const t = [0, 1].map(i => { const id = old[i]; return EX[id] && typeOk(EX[id]) && (!newOnly() || !isDone(id)) ? id : pickOne([TASK1, TASK2][i], id); });
+  const changed = t.some((id, i) => id !== old[i]);
+  renderTypes(); setTrio(t, changed);
+}
+$('#ptypes').addEventListener('change', e => {
+  const b = e.target.closest('input[data-task]'); if(!b) return;
+  const task = +b.dataset.task;
+  const off = [...$('#ptypes').querySelectorAll(`input[data-task="${task}"]`)].filter(x => !x.checked).map(x => x.value);
+  setTypes(task, off);
+  const again = $('#ptypes').querySelector(`input[data-task="${task}"][value="${CSS.escape(b.value)}"]`); again && again.focus();
+});
+$('#ptypes').addEventListener('click', e => {
+  const b = e.target.closest('[data-all]'); if(!b) return;
+  const task = +b.dataset.all, all = !offTypes()[task - 1].length;
+  setTypes(task, all ? TYPES[task - 1].slice() : []);
+  const again = $('#ptypes').querySelector(`[data-all="${task}"]`); again && again.focus();
+});
 function renderNewOnly(){
   const can = canNewOnly(), box = $('#newOnly'), note = $('#newOnlyNote');
   box.disabled = !can; box.checked = newOnly(); note.hidden = can;
@@ -1091,17 +1169,20 @@ $('#newOnly').addEventListener('change', () => {
   LS.set(K.newOnly(), $('#newOnly').checked);
   const t2 = LS.get(K.next(), null);
   if($('#newOnly').checked && t2 && t2.some(id => isDone(id))){
-    const t = pickPair(); LS.set(K.next(), t);
-    const ol = $('#trio'); ol.classList.remove('swap'); ol.innerHTML = pairHtml(t); void ol.offsetWidth; ol.classList.add('swap');
+    setTrio(pickPair(), true);
   }
+  renderTypesNote();
 });
 $('#shuffleBtn').addEventListener('click', () => {
+  if(!typesReady()){ toast('Choose at least one question type for each task first.', 'warn'); return; }
   const old = LS.get(K.next(), null) || nextPair();
-  const t = pickPair(old); LS.set(K.next(), t); LS.set(K.shuf(), (LS.get(K.shuf(), 0) || 0) + 1);
-  const ol = $('#trio'); ol.classList.remove('swap'); ol.innerHTML = pairHtml(t); void ol.offsetWidth; ol.classList.add('swap');
+  const t = pickPair(old); LS.set(K.shuf(), (LS.get(K.shuf(), 0) || 0) + 1);
+  setTrio(t, true);
 });
 $('#startBtn').addEventListener('click', () => {
+  if(!typesReady()){ toast('Choose at least one question type for each task first.', 'warn'); return; }
   const ids = nextPair();
+  if(!ids.every(id => EX[id])) return;
   cur = {attemptId: uid(), ids, answers: ['', ''], elapsed: 0, startedAt: new Date().toISOString(), task: 0, status: 'active', sessions: 1, shuffles: LS.get(K.shuf(), 0) || 0};
   saveCur(); LS.del(K.next()); LS.del(K.shuf());
   startTest(true);
