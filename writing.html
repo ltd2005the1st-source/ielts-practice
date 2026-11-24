@@ -1550,13 +1550,16 @@ function reserve(){
     m.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;box-sizing:border-box;margin:0;width:'+w+'px';
     try{m.innerHTML=CFG.groups().map(CFG.html).join('');}catch(e){return;}
     ol.parentNode.appendChild(m);
-    var P=Math.max(1,ol.children.length),max=[];
-    for(var i=0;i<m.children.length;i++){var c=m.children[i];c.style.animation='none';var p=i%P;max[p]=Math.max(max[p]||0,c.offsetHeight);}
-    m.remove();measured=max;lastW=w;
+    var P=Math.max(1,ol.children.length),all=[];
+    for(var i=0;i<m.children.length;i++){var c=m.children[i];c.style.animation='none';var p=i%P;(all[p]=all[p]||[]).push(c.offsetHeight);}
+    m.remove();var max=all.map(function(a){a.sort(function(x,y){return x-y;});return a[Math.floor((a.length-1)*.92)];});measured=max;lastW=w;
   }
-  ol.style.minHeight='';/* no reserved space: the buttons sit right under the list */
+  /* fixed row heights (92nd percentile) so Start test and Shuffle never move; the rare longer question scrolls inside its row */
+  ol.style.minHeight='';
+  for(var j=0;j<ol.children.length;j++){var li=ol.children[j];li.style.boxSizing='border-box';li.style.height=(measured[j]||0)+'px';li.style.overflowY='auto';}
 }
 function later(){requestAnimationFrame(reserve);}
+(function(){var ol=$id('trio');if(ol)new MutationObserver(later).observe(ol,{childList:true});})();
 var _rh=renderHome,_sh=show;renderHome=function(){var r=_rh.apply(this,arguments);later();return r;};show=function(){var r=_sh.apply(this,arguments);later();return r;};
 window.addEventListener('resize',function(){clearTimeout(reserve.t);reserve.t=setTimeout(reserve,120);});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){measured=null;later();});
