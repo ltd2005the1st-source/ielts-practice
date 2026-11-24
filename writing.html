@@ -889,6 +889,13 @@ html body .btn .kbd{display:inline-flex;align-items:center;height:1.45em;padding
 /* sound toggle */
 @media (max-width:900px){html body .tbar .sound-btn{display:none}}
 @media (hover:none),(pointer:coarse){html body .sound-btn{display:none}}
+
+/* Task 2 instruction line: own line, highlighter sweep */
+html body .trio .winstr{margin-top:6px}
+html body .wprompt .winstr{margin-top:.7em}
+.hl{background-image:linear-gradient(var(--sun),var(--sun));background-repeat:no-repeat;background-position:0 0;background-size:0% 100%;color:var(--sun-ink);padding:0 .12em;margin:0 -.12em;border-radius:2px;animation:hlsweep .75s cubic-bezier(.22,1,.36,1) .25s forwards}
+@keyframes hlsweep{to{background-size:100% 100%}}
+@media (prefers-reduced-motion:reduce){.hl{animation:none;background-size:100% 100%}}
 </style>
 <script src="scroll.js"></script>
 </head>
@@ -1003,6 +1010,19 @@ const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
 const words = t => (String(t || '').trim().match(/\S+/g) || []).filter(w => /[A-Za-z0-9]/.test(w)).length;
 const SUMMARISE = /^summari[sz]e the information\b/i;
 const promptLines = e => e.prompt.filter(l => !SUMMARISE.test(l.trim()));
+// Task 2: peel the closing instruction ("Discuss both views...", "To what extent...?") onto its own line
+const INSTR = /^(discuss|give|explain|describe|suggest|outline|compare|evaluate|provide|include|support|use)\b/i;
+function splitT2(lines){
+  const parts = [];
+  lines.forEach((l, li) => l.trim().split(/(?<=[.?!]["”’)]?)\s+(?=[A-Z“"‘(])/).forEach(t => t.trim() && parts.push({li, t: t.trim()})));
+  let k = parts.length;
+  while(k > 0 && (/\?["”’)]*$/.test(parts[k - 1].t) || INSTR.test(parts[k - 1].t))) k--;
+  if(k === parts.length) return {body: lines, instr: ''};
+  if(k === 0) k = 1;
+  const body = []; parts.slice(0, k).forEach(x => { body[x.li] = body[x.li] ? body[x.li] + ' ' + x.t : x.t; });
+  return {body: body.filter(Boolean), instr: parts.slice(k).map(x => x.t).join(' ')};
+}
+const hlHtml = t => `<span class="hl">${esc(t)}</span>`;
 
 /* ---------- theme ---------- */
 function applyTheme(){
@@ -1110,7 +1130,8 @@ function enterHome(){
 function pairHtml(ids){
   return ids.map((id, i) => { const e = EX[id];
     if(!e) return `<li class="empty-task"><span class="pn num">${i + 1}</span><div><h3>No Task ${i + 1} question types chosen</h3><div class="wtype">Choose at least one Task ${i + 1} type below to build your test.</div></div></li>`;
-    return `<li><span class="pn num">${i + 1}</span><div>${(([h, ...rest]) => `<h3>${esc(h)}</h3>` + rest.map(l => `<p class="wmore">${esc(l)}</p>`).join(''))(promptLines(e))}<div class="wtype">Task ${e.task}, ${esc(typeLabel(e.type).toLowerCase())}. At least ${MIN_WORDS[e.task]} words, about ${SUGGEST[e.task]} minutes.</div></div></li>`; }).join('');
+    const sp = e.task === 2 ? splitT2(promptLines(e)) : {body: promptLines(e), instr: ''};
+    return `<li><span class="pn num">${i + 1}</span><div>${(([h, ...rest]) => `<h3>${esc(h)}</h3>` + rest.map(l => `<p class="wmore">${esc(l)}</p>`).join(''))(sp.body)}${sp.instr ? `<h3 class="winstr">${hlHtml(sp.instr)}</h3>` : ''}<div class="wtype">Task ${e.task}, ${esc(typeLabel(e.type).toLowerCase())}. At least ${MIN_WORDS[e.task]} words, about ${SUGGEST[e.task]} minutes.</div></div></li>`; }).join('');
 }
 function renderHome(){
   const first = profile.name.split(' ').slice(-1)[0];
@@ -1244,7 +1265,7 @@ $('#clearAll').addEventListener('click', async () => {
 /* ---------- test ---------- */
 function promptHtml(e, withMeta){
   return (withMeta ? `<p class="wmeta">You should spend about ${SUGGEST[e.task]} minutes on this task.</p>` : '') +
-    `<div class="wprompt">${e.prompt.map((l, i) => `<p class="${i === 0 ? 'q1' : ''}">${esc(l)}</p>`).join('')}</div>` +
+    (sp => `<div class="wprompt">${sp.body.map((l, i) => `<p class="${i === 0 ? 'q1' : ''}">${esc(l)}</p>`).join('')}${sp.instr ? `<p class="winstr">${hlHtml(sp.instr)}</p>` : ''}</div>`)(e.task === 2 ? splitT2(e.prompt) : {body: e.prompt, instr: ''}) +
     (e.imgs.length ? `<div class="wfig">${e.imgs.map((im, k) => `<img src="${esc(im.src)}" width="${im.w}" height="${im.h}" alt="${esc(e.type)} for Task 1${e.imgs.length > 1 ? ', picture ' + (k + 1) : ''}">`).join('')}</div>` : '') +
     `<p class="wmin">Write at least ${MIN_WORDS[e.task]} words.</p>`;
 }
