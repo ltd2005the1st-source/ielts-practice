@@ -809,6 +809,13 @@ b.wl{font-weight:800}
 @media (min-width:1280px) and (max-width:1439px){.deco .d{scale:.85}}
 @media (min-width:900px) and (max-width:1279px){.deco .d{scale:.65}}
 
+
+/* hub cards: no top bar; lift with a hard offset shadow on hover */
+:root{--card-shadow:var(--ink)}
+:root[data-theme="dark"]{--card-shadow:#000}
+html body .skillgrid .skill{border-top:1px solid var(--rule)!important;box-shadow:0 0 0 0 var(--card-shadow);transition:transform .18s ease-out,box-shadow .18s ease-out,border-color .18s ease-out!important}
+@media (hover:hover){html body .skillgrid .skill:hover{transform:translateY(-3px)!important;box-shadow:4px 4px 0 0 var(--card-shadow);border-color:var(--ink)!important}}
+@media (prefers-reduced-motion:reduce){html body .skillgrid .skill:hover{transform:none!important}}
 </style>
 <script src="scroll.js"></script>
 </head>
