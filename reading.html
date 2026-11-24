@@ -2102,16 +2102,30 @@ function hover(){
   f.type='lowpass';f.frequency.value=3200;env(g,t,.03,.004,.05);
   o.connect(f);f.connect(g);g.connect(master);o.start(t);o.stop(t+.08);
 }
-function press(k){
-  var c=ac();if(!c)return;var t=c.currentTime+.005;k=k||1;
-  var o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
-  o.type='sine';o.frequency.setValueAtTime(jit(210*k,.05),t);o.frequency.exponentialRampToValueAtTime(jit(95*k,.05),t+.07);
-  lp.type='lowpass';lp.frequency.value=900;env(g,t,.22,.003,.1);
-  o.connect(lp);lp.connect(g);g.connect(master);o.start(t);o.stop(t+.14);
-  var s=c.createBufferSource(),bp=c.createBiquadFilter(),ng=c.createGain();s.buffer=noise;s.playbackRate.value=jit(1,.08);
-  bp.type='bandpass';bp.frequency.value=jit(2600*k,.1);bp.Q.value=.9;env(ng,t,.09,.001,.025);
-  s.connect(bp);bp.connect(ng);ng.connect(master);s.start(t);s.stop(t+.05);
+function burst(c,t,fType,freq,q,peak,dcy,rate){
+  var s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=noise;s.playbackRate.value=rate||1;
+  f.type=fType;f.frequency.value=freq;f.Q.value=q;env(g,t,peak,.0008,dcy);s.connect(f);f.connect(g);g.connect(master);s.start(t);s.stop(t+dcy+.02);
 }
+function tone(c,t,type,f0,f1,peak,dcy){
+  var o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dcy);
+  env(g,t,peak,.001,dcy);o.connect(g);g.connect(master);o.start(t);o.stop(t+dcy+.02);
+}
+/* clicky switch + PBT keycap: click-jacket snap, then a dry, matte bottom-out clack */
+function press(k){
+  var c=ac();if(!c)return;var t=c.currentTime+.004;k=k||1;
+  burst(c,t,'bandpass',jit(4600*k,.06),2.2,.24,.012,jit(1.1,.05));
+  tone(c,t,'triangle',jit(3900*k,.04),jit(3300*k,.04),.035,.018);
+  var t2=t+jit(.009,.15);
+  burst(c,t2,'bandpass',jit(1450*k,.06),1.3,.3,.034,jit(.9,.05));
+  tone(c,t2,'sine',jit(170*k,.05),jit(110*k,.05),.12,.045);
+}
+/* key coming back up: a smaller, higher click */
+function release(k){
+  var c=ctx;if(!c||c.state!=='running')return;var t=c.currentTime+.002;k=k||1;
+  burst(c,t,'bandpass',jit(3800*k,.08),2,.07,.01,1.15);
+  burst(c,t+.006,'bandpass',jit(1900*k,.08),1.4,.06,.018,1);
+}
+var downEl=null;
 function target(e){var el=e.target&&e.target.closest?e.target.closest(SEL):null;if(!el)return null;
   if(el.disabled||el.getAttribute('aria-disabled')==='true')return null;var i=el.tagName==='LABEL'?el.querySelector('input'):null;if(i&&i.disabled)return null;return el;}
 function isBox(el){return el&&el.tagName==='LABEL'&&!!el.querySelector('input[type=checkbox],input[type=radio]');}
@@ -2121,11 +2135,13 @@ document.addEventListener('pointerover',function(e){
   var n=performance.now();if(n-lastHover<70)return;lastHover=n;hover();
 },true);
 document.addEventListener('pointerout',function(e){if(lastEl&&!(e.relatedTarget&&lastEl.contains(e.relatedTarget)))lastEl=null;},true);
-document.addEventListener('pointerdown',function(e){if(e.pointerType==='touch'){return;}if(!fine)return;ac();var el=target(e);if(on()&&el&&!isBox(el))press();},true);
+document.addEventListener('pointerdown',function(e){if(e.pointerType==='touch'){return;}if(!fine)return;ac();var el=target(e);if(on()&&el&&!isBox(el)){press();downEl=el;}},true);
+document.addEventListener('pointerup',function(){if(downEl){downEl=null;if(on())release();}},true);
+document.addEventListener('pointercancel',function(){downEl=null;},true);
 document.addEventListener('keydown',function(e){if(fine)ac();},true);
-document.addEventListener('click',function(e){if(e.detail!==0||!fine||!on())return;var el=target(e);if(el&&!isBox(el))press();},true);
+document.addEventListener('click',function(e){if(e.detail!==0||!fine||!on())return;var el=target(e);if(el&&!isBox(el)){press();setTimeout(release,75);}},true);
 /* tick higher, untick lower */
-document.addEventListener('change',function(e){var i=e.target;if(!fine||!on()||!i||i.type!=='checkbox'&&i.type!=='radio')return;press(i.checked?1.3:.8);},true);
+document.addEventListener('change',function(e){var i=e.target;if(!fine||!on()||!i||i.type!=='checkbox'&&i.type!=='radio')return;var k=i.checked?1.12:.88;press(k);setTimeout(function(){release(k);},70);},true);
 /* toggle next to Dark/Light */
 function paint(){document.querySelectorAll('.sound-btn').forEach(function(b){var v=on();b.textContent=v?'Sound on':'Sound off';b.setAttribute('aria-pressed',v?'true':'false');});}
 document.querySelectorAll('[data-theme-toggle]').forEach(function(t){var b=document.createElement('button');b.type='button';b.className='theme-btn sound-btn';b.title='Turn button sounds on or off';
