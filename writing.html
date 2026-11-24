@@ -1554,9 +1554,7 @@ function reserve(){
     for(var i=0;i<m.children.length;i++){var c=m.children[i];c.style.animation='none';var p=i%P;max[p]=Math.max(max[p]||0,c.offsetHeight);}
     m.remove();measured=max;lastW=w;
   }
-  ol.style.minHeight='';
-  var extra=0;for(var j=0;j<ol.children.length;j++){extra+=Math.max(0,(measured[j]||0)-ol.children[j].offsetHeight);}
-  ol.style.minHeight=(ol.offsetHeight+extra)+'px';
+  ol.style.minHeight='';/* no reserved space: the buttons sit right under the list */
 }
 function later(){requestAnimationFrame(reserve);}
 var _rh=renderHome,_sh=show;renderHome=function(){var r=_rh.apply(this,arguments);later();return r;};show=function(){var r=_sh.apply(this,arguments);later();return r;};
