@@ -813,8 +813,8 @@ b.wl{font-weight:800}
 /* hub cards: no top bar; lift with a hard offset shadow on hover */
 :root{--card-shadow:var(--ink)}
 :root[data-theme="dark"]{--card-shadow:#000}
-html body .skillgrid .skill{border-top:1px solid var(--rule)!important;box-shadow:0 0 0 0 var(--card-shadow);transition:transform .18s ease-out,box-shadow .18s ease-out,border-color .18s ease-out!important}
-@media (hover:hover){html body .skillgrid .skill:hover{transform:translateY(-3px)!important;box-shadow:0 4px 0 0 var(--card-shadow);border-color:var(--ink)!important}}
+html body .skillgrid .skill{border-top:1px solid var(--rule)!important;box-shadow:0 0 0 0 var(--card-shadow);transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s cubic-bezier(.22,1,.36,1),border-color .25s ease-out!important}
+@media (hover:hover){html body .skillgrid .skill:hover{transform:translateY(-3.6px)!important;box-shadow:0 4px 0 0 var(--card-shadow);border-color:var(--ink)!important}}
 @media (prefers-reduced-motion:reduce){html body .skillgrid .skill:hover{transform:none!important}}
 </style>
 <script src="scroll.js"></script>
