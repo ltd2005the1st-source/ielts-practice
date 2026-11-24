@@ -885,6 +885,10 @@ html body .btn::before{transform:scaleY(0)!important;transform-origin:bottom!imp
 html body .btn:hover::before{transform:scaleY(1)!important}
 html body .btn .kbd{display:inline-flex;align-items:center;height:1.45em;padding:0 .4em;margin-left:.15em;border:1px solid currentColor;border-radius:4px;font-size:.68em;font-weight:600;letter-spacing:.02em;opacity:.6;line-height:1}
 @media (hover:none){html body .btn .kbd{display:none}}
+
+/* sound toggle */
+@media (max-width:900px){html body .tbar .sound-btn{display:none}}
+@media (hover:none),(pointer:coarse){html body .sound-btn{display:none}}
 </style>
 <script src="scroll.js"></script>
 </head>
@@ -1667,5 +1671,55 @@ if(profile && profile.name){ if(!LS.get('ielts_profile', null)) LS.set('ielts_pr
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();</script>
+<script>/* ui sounds: soft key blip on hover, thock on press (Web Audio, no files) */
+(function(){
+var KEY='ielts_sound',SEL='.btn,.theme-btn,.pbtn,.check,.skillgrid .skill',ctx=null,master=null,noise=null,lastHover=0,lastEl=null;
+function on(){try{return localStorage.getItem(KEY)!=='0';}catch(e){return true;}}
+function setOn(v){try{localStorage.setItem(KEY,v?'1':'0');}catch(e){}paint();}
+var fine=window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches;
+function ac(){
+  if(!ctx){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ctx=new C();master=ctx.createGain();master.gain.value=.55;
+    var comp=ctx.createDynamicsCompressor();master.connect(comp);comp.connect(ctx.destination);
+    var n=ctx.sampleRate*.05|0;noise=ctx.createBuffer(1,n,ctx.sampleRate);var d=noise.getChannelData(0);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);}
+  if(ctx.state==='suspended')ctx.resume();
+  return ctx;
+}
+function jit(x,p){return x*(1+(Math.random()*2-1)*p);}
+function env(g,t,peak,a,dcy){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+dcy);}
+function hover(){
+  var c=ctx;if(!c||c.state!=='running')return;var t=c.currentTime;
+  var o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();
+  o.type='triangle';o.frequency.setValueAtTime(jit(1650,.04),t);o.frequency.exponentialRampToValueAtTime(jit(1250,.04),t+.05);
+  f.type='lowpass';f.frequency.value=3200;env(g,t,.03,.004,.05);
+  o.connect(f);f.connect(g);g.connect(master);o.start(t);o.stop(t+.08);
+}
+function press(){
+  var c=ac();if(!c)return;var t=c.currentTime+.005;
+  var o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+  o.type='sine';o.frequency.setValueAtTime(jit(210,.05),t);o.frequency.exponentialRampToValueAtTime(jit(95,.05),t+.07);
+  lp.type='lowpass';lp.frequency.value=900;env(g,t,.22,.003,.1);
+  o.connect(lp);lp.connect(g);g.connect(master);o.start(t);o.stop(t+.14);
+  var s=c.createBufferSource(),bp=c.createBiquadFilter(),ng=c.createGain();s.buffer=noise;s.playbackRate.value=jit(1,.08);
+  bp.type='bandpass';bp.frequency.value=jit(2600,.1);bp.Q.value=.9;env(ng,t,.09,.001,.025);
+  s.connect(bp);bp.connect(ng);ng.connect(master);s.start(t);s.stop(t+.05);
+}
+function target(e){var el=e.target&&e.target.closest?e.target.closest(SEL):null;if(!el)return null;
+  if(el.disabled||el.getAttribute('aria-disabled')==='true')return null;var i=el.querySelector&&el.classList.contains('check')?el.querySelector('input'):null;if(i&&i.disabled)return null;return el;}
+document.addEventListener('pointerover',function(e){
+  if(!fine||e.pointerType!=='mouse'||!on())return;var el=target(e);if(!el||el===lastEl)return;
+  if(e.relatedTarget&&el.contains(e.relatedTarget))return;lastEl=el;
+  var n=performance.now();if(n-lastHover<70)return;lastHover=n;hover();
+},true);
+document.addEventListener('pointerout',function(e){if(lastEl&&!(e.relatedTarget&&lastEl.contains(e.relatedTarget)))lastEl=null;},true);
+document.addEventListener('pointerdown',function(e){if(e.pointerType==='touch'){return;}if(!fine)return;ac();if(on()&&target(e))press();},true);
+document.addEventListener('keydown',function(e){if(fine)ac();},true);
+document.addEventListener('click',function(e){if(e.detail!==0||!fine||!on())return;if(target(e))press();},true);
+/* toggle next to Dark/Light */
+function paint(){document.querySelectorAll('.sound-btn').forEach(function(b){var v=on();b.textContent=v?'Sound on':'Sound off';b.setAttribute('aria-pressed',v?'true':'false');});}
+document.querySelectorAll('[data-theme-toggle]').forEach(function(t){var b=document.createElement('button');b.type='button';b.className='theme-btn sound-btn';b.title='Turn button sounds on or off';
+  b.addEventListener('click',function(){setOn(!on());});t.parentNode.insertBefore(b,t);});
+paint();
+})();
+</script>
 </body>
 </html>
