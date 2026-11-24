@@ -882,6 +882,12 @@ html body .skillgrid .skill:hover,html body .btn:not(:disabled):hover,html body 
 html body .skillgrid .skill:hover{border-color:var(--ink)!important}
 }
 @media (prefers-reduced-motion:reduce){html body .skillgrid .skill:hover,html body .btn:hover,html body .theme-btn:hover,html body .pbtn:hover,html body .check:hover{transform:none!important}}
+
+/* hover fill sweeps bottom to top; shortcut hints */
+html body .btn::before{transform:scaleY(0)!important;transform-origin:bottom!important;transform-origin:50% 100%!important}
+html body .btn:hover::before{transform:scaleY(1)!important}
+html body .btn .kbd{display:inline-flex;align-items:center;height:1.45em;padding:0 .4em;margin-left:.15em;border:1px solid currentColor;border-radius:4px;font-size:.68em;font-weight:600;letter-spacing:.02em;opacity:.6;line-height:1}
+@media (hover:none){html body .btn .kbd{display:none}}
 </style>
 <script src="scroll.js"></script>
 </head>
@@ -2052,6 +2058,53 @@ function connectionTest(){
   };
 }
 
+/* setup screen: fixed button row, Enter/Tab shortcuts, dialog keys */
+(function(){
+var CFG={groups:()=>DATA.map(e=>e.id),html:g=>testHtml(g),shuffle:false};
+function $id(i){return document.getElementById(i);}
+function homeOpen(){var h=$id('screen-home'),n=$id('nextBox');return h&&!h.classList.contains('hidden')&&n&&!n.classList.contains('hidden');}
+var measured=null,lastW=0;
+function reserve(){
+  var ol=$id('trio');if(!ol||!homeOpen()||!ol.offsetParent)return;
+  var w=ol.getBoundingClientRect().width;if(!w)return;
+  if(!measured||Math.abs(w-lastW)>1){
+    var m=document.createElement('ol');m.className='trio';m.setAttribute('aria-hidden','true');
+    m.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;box-sizing:border-box;margin:0;width:'+w+'px';
+    try{m.innerHTML=CFG.groups().map(CFG.html).join('');}catch(e){return;}
+    ol.parentNode.appendChild(m);
+    var P=Math.max(1,ol.children.length),max=[];
+    for(var i=0;i<m.children.length;i++){var c=m.children[i];c.style.animation='none';var p=i%P;max[p]=Math.max(max[p]||0,c.offsetHeight);}
+    m.remove();measured=max;lastW=w;
+  }
+  ol.style.minHeight='';
+  var extra=0;for(var j=0;j<ol.children.length;j++){extra+=Math.max(0,(measured[j]||0)-ol.children[j].offsetHeight);}
+  ol.style.minHeight=(ol.offsetHeight+extra)+'px';
+}
+function later(){requestAnimationFrame(reserve);}
+var _rh=renderHome,_sh=show;renderHome=function(){var r=_rh.apply(this,arguments);later();return r;};show=function(){var r=_sh.apply(this,arguments);later();return r;};
+window.addEventListener('resize',function(){clearTimeout(reserve.t);reserve.t=setTimeout(reserve,120);});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){measured=null;later();});
+later();
+/* shortcut hints */
+function kbd(btn,k){if(btn&&!btn.querySelector('.kbd')){var s=document.createElement('span');s.className='kbd';s.setAttribute('aria-hidden','true');s.textContent=k;btn.appendChild(s);}}
+kbd($id('startBtn'),'Enter');if(CFG.shuffle)kbd($id('shuffleBtn'),'Tab');
+var sb=$id('startBtn');if(sb)sb.setAttribute('aria-keyshortcuts','Enter');var sh=$id('shuffleBtn');if(sh&&CFG.shuffle)sh.setAttribute('aria-keyshortcuts','Tab');
+new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(o){if(o.nodeType===1&&o.classList.contains('overlay')){var bs=o.querySelectorAll('.row .btn');var pr=o.querySelector('.row .btn-primary')||bs[bs.length-1];bs.forEach(function(b){kbd(b,b===pr?'Enter':(bs.length>1?'Esc':''));});o.querySelectorAll('.kbd').forEach(function(k){if(!k.textContent)k.remove();});}});});}).observe(document.body,{childList:true});
+/* keys */
+function typing(t){return t&&(t.closest('input,textarea,select,button,a[href],summary,label,[contenteditable],[role=button]'));}
+document.addEventListener('keydown',function(e){
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||e.isComposing)return;
+  var ov=document.querySelector('.overlay');
+  if(ov){
+    if(e.key==='Enter'&&!e.shiftKey&&!(e.target&&e.target.closest&&e.target.closest('button,textarea,input,select'))){var pr=ov.querySelector('.row .btn-primary')||ov.querySelector('.row .btn:last-child');if(pr){e.preventDefault();pr.click();}}
+    else if(e.key==='Escape'&&!ov.contains(e.target)){e.preventDefault();ov.click();}
+    return;
+  }
+  if(!homeOpen()||e.shiftKey||e.repeat||typing(e.target))return;
+  if(e.key==='Enter'){var b=$id('startBtn');if(b&&!b.disabled){e.preventDefault();b.click();}}
+  else if(e.key==='Tab'&&CFG.shuffle){var s=$id('shuffleBtn');if(s&&!s.disabled){e.preventDefault();s.click();}}
+});
+})();
 /* ---------- boot ---------- */
 if(!ONLINE){ const n = document.createElement('div'); n.className = 'preview-note'; n.textContent = ENDPOINT ? 'Results cannot be sent: the address in config.js is not a valid Apps Script web app URL.' : (window.IRT_CONFIG ? 'Results are not being sent yet: add your Apps Script web app URL to config.js.' : 'Preview: everything works here except emailing results.'); document.body.appendChild(n); setTimeout(() => n.remove(), 7000); }
 window.__irl = {isRight: (q, a) => isRight(q, a), renderTest: () => renderTest(), grade: () => grade(), get cur(){ return cur; }, EX, setAnswer: (k, v) => { getA()[k] = v; saveCur(); }, submit: () => doSubmit(), startCheck: a => startCheck(a), get audio(){ return audio; }, tickN: n => { for(let i = 0; i < n; i++){ if(cur.phase === 'listen') cur.listenElapsed++; else cur.checkElapsed++; } updateTimer(); }};
