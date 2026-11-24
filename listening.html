@@ -870,6 +870,18 @@ b.wl{font-weight:800}
 .rp.trs p.nar{color:var(--ink-3);font-size:.92em}
 .rp.trs p.nar b{color:var(--ink-3)}
 .cn.flash,mark.clue.flash{outline:3px solid var(--accent);outline-offset:1px}
+
+/* lift + solid drop shadow on hover: cards, buttons, checkboxes */
+:root{--card-shadow:var(--ink)}
+:root[data-theme="dark"]{--card-shadow:#000}
+html body .skillgrid .skill{border-top:1px solid var(--rule)!important}
+html body .skillgrid .skill,html body .btn,html body .theme-btn,html body .pbtn,html body .check,html body .check .box{box-shadow:0 0 0 0 var(--card-shadow);transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s cubic-bezier(.22,1,.36,1),color .25s ease-out,background-color .25s ease-out,border-color .25s ease-out!important}
+@media (hover:hover){
+html body .skillgrid .skill:hover,html body .btn:not(:disabled):hover,html body .theme-btn:hover,html body .pbtn:not(:disabled):hover,html body .check:not(:has(input:disabled)):hover{transform:translateY(-3.6px)!important}
+html body .skillgrid .skill:hover,html body .btn:not(:disabled):hover,html body .theme-btn:hover,html body .pbtn:not(:disabled):hover,html body .check:not(:has(input:disabled)):hover .box{box-shadow:0 4px 0 0 var(--card-shadow)}
+html body .skillgrid .skill:hover{border-color:var(--ink)!important}
+}
+@media (prefers-reduced-motion:reduce){html body .skillgrid .skill:hover,html body .btn:hover,html body .theme-btn:hover,html body .pbtn:hover,html body .check:hover{transform:none!important}}
 </style>
 <script src="scroll.js"></script>
 </head>
