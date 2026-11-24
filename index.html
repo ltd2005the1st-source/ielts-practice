@@ -821,6 +821,12 @@ html body .skillgrid .skill:hover,html body .btn:not(:disabled):hover,html body 
 html body .skillgrid .skill:hover{border-color:var(--ink)!important}
 }
 @media (prefers-reduced-motion:reduce){html body .skillgrid .skill:hover,html body .btn:hover,html body .theme-btn:hover,html body .pbtn:hover,html body .check:hover{transform:none!important}}
+
+/* hover fill sweeps bottom to top; shortcut hints */
+html body .btn::before{transform:scaleY(0)!important;transform-origin:bottom!important;transform-origin:50% 100%!important}
+html body .btn:hover::before{transform:scaleY(1)!important}
+html body .btn .kbd{display:inline-flex;align-items:center;height:1.45em;padding:0 .4em;margin-left:.15em;border:1px solid currentColor;border-radius:4px;font-size:.68em;font-weight:600;letter-spacing:.02em;opacity:.6;line-height:1}
+@media (hover:none){html body .btn .kbd{display:none}}
 </style>
 <script src="scroll.js"></script>
 </head>
