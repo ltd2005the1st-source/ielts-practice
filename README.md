@@ -13,7 +13,7 @@ Students type their name once, pick a skill and take a test. Reading and Listeni
 | **Reading** | Three passages, about 40 questions, 60 minutes | 240 passages (30 practice sets) |
 | **Listening** | Four parts, 40 questions. 45 minutes of audio, then 5 minutes to check with the audio locked | 24 tests |
 | **Writing** | One Task 1 and one Task 2 in 60 minutes, with a live word count | 192 Task 1 and 118 Task 2 prompts |
-| **Speaking** | Three Part 1 topics (up to 10 minutes), then a cue card: 1 minute to prepare, 2 minutes to talk | 72 Part 1 topics, 154 cue cards |
+| **Speaking** | Three Part 1 topics (up to 10 minutes), a cue card (1 minute to prepare, 2 minutes to talk), then two Part 3 discussion questions on the cue card topic (up to 5 minutes) | 72 Part 1 topics, 154 cue cards, each with two Part 3 questions |
 
 ## Features
 
